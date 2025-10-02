@@ -1,5 +1,7 @@
 package io.github.some_example_name;
 
+import static io.github.some_example_name.MyGdxGame.SCR_HEIGHT;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
@@ -11,17 +13,17 @@ public class Bird {
     int speed;
     int jumpHeight;
     final int maxHeightOfJump = 200;
-    boolean jump = true;
+    boolean jump;
 
     int frameCounter;
     Texture[] framesArray;
 
-    public Bird(int x, int y, int speed, int birdWith, int birdHeight) {
+    public Bird(int x, int y, int speed, int width, int height) {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        this.width = birdWith;
-        this.height = birdHeight;
+        this.width = width;
+        this.height = height;
         frameCounter = 0;
 
         framesArray = new Texture[]{
@@ -47,6 +49,12 @@ public class Bird {
         } else {
             y -= speed;
         }
+    }
+
+    boolean isInField() {
+        if (y + height < 0) return false;
+        if (y > SCR_HEIGHT) return false;
+        return true;
     }
 
     void draw(Batch batch) {
