@@ -1,22 +1,23 @@
 package io.github.some_example_name;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class ScreenGame implements Screen {
 
     MyGdxGame myGdxGame;
 
-    Texture birdTexture;
+    Bird bird;
 
-    int birdX = 0, birdY = 0;
-    int birdSpeed = 5;
-
+    int tubeCount = 3;
+    Tube[] tubes;
 
     ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
-        birdTexture = new Texture("bird0.png");
+
+        initTubes();
+        bird = new Bird(0, 0, 10, 250, 200);
     }
 
 
@@ -28,15 +29,21 @@ public class ScreenGame implements Screen {
     @Override
     public void render(float delta) {
 
-        birdX += birdSpeed;
-        birdY += birdSpeed;
+        if (Gdx.input.justTouched()) {
+            bird.onClick();
+        }
+
+        bird.fly();
+
+        for (Tube tube : tubes) tube.move();
 
         ScreenUtils.clear(1, 0, 0, 1);
         myGdxGame.camera.update();
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
         myGdxGame.batch.begin();
 
-        myGdxGame.batch.draw(birdTexture, birdX, birdY);
+        bird.draw(myGdxGame.batch);
+        for (Tube tube : tubes) tube.draw(myGdxGame.batch);
 
         myGdxGame.batch.end();
     }
@@ -63,6 +70,17 @@ public class ScreenGame implements Screen {
 
     @Override
     public void dispose() {
-        birdTexture.dispose();
+        bird.dispose();
+        for (int i = 0; i < tubeCount; i++) {
+            tubes[i].dispose();
+        }
     }
+
+    void initTubes() {
+        tubes = new Tube[tubeCount];
+        for (int i = 0; i < tubeCount; i++) {
+            tubes[i] = new Tube(tubeCount, i);
+        }
+    }
+
 }
