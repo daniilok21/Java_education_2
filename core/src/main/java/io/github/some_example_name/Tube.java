@@ -18,6 +18,8 @@ public class Tube {
     int x, gapY;
     int distanceBetweenTubes;
 
+    boolean isPointReceived;
+
     int speed = 10;
     final int width = 200;
     final int height = 700;
@@ -33,6 +35,8 @@ public class Tube {
 
         textureUpperTube = new Texture("tubes/tube_flipped.png");
         textureDownTube = new Texture("tubes/tube.png");
+
+        isPointReceived = false;
     }
 
     void draw(Batch batch) {
@@ -43,6 +47,7 @@ public class Tube {
     void move() {
         x -= speed;
         if (x < -width) {
+            isPointReceived = false;
             x = SCR_WIDTH + distanceBetweenTubes;
             gapY = gapHeight / 2 + padding + random.nextInt(SCR_HEIGHT - 2 * (padding + gapHeight / 2));
         }
@@ -58,6 +63,14 @@ public class Tube {
             return true;
 
         return false;
+    }
+
+    public boolean needAddPoint(Bird bird) {
+        return !isPointReceived && bird.x > x + width;
+    }
+
+    public void setPointReceived() {
+        isPointReceived = true;
     }
 
     void dispose() {

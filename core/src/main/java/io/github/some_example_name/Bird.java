@@ -7,13 +7,15 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 public class Bird {
 
-    int x, y;
-    int width, height;
+    int x;
+    int y;
+    int width;
+    int height;
 
     int speed;
     int jumpHeight;
-    final int maxHeightOfJump = 200;
-    boolean jump;
+    final int maxHeightOfJump = 100;
+    boolean jump = true;
 
     int frameCounter;
     Texture[] framesArray;
