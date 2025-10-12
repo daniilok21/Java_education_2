@@ -1,4 +1,4 @@
-package io.github.some_example_name;
+package io.github.some_example_name.screens;
 
 import static io.github.some_example_name.MyGdxGame.SCR_HEIGHT;
 import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
@@ -6,6 +6,12 @@ import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import io.github.some_example_name.MyGdxGame;
+import io.github.some_example_name.characters.Bird;
+import io.github.some_example_name.characters.Tube;
+import io.github.some_example_name.components.MovingBackground;
+import io.github.some_example_name.components.PointCounter;
 
 public class ScreenGame implements Screen {
 
@@ -24,11 +30,11 @@ public class ScreenGame implements Screen {
     int gamePoints;
     boolean isGameOver;
 
-    ScreenGame(MyGdxGame myGdxGame) {
+    public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
 
         initTubes();
-        background = new MovingBackground();
+        background = new MovingBackground("backgrounds/game_bg.png");
         bird = new Bird(20, SCR_HEIGHT / 2, 10, 250, 200);
         pointCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop);
     }
@@ -38,10 +44,17 @@ public class ScreenGame implements Screen {
     public void show() {
         gamePoints = 0;
         isGameOver = false;
+        bird.setY(SCR_HEIGHT / 2);
+        initTubes();
     }
 
     @Override
     public void render(float delta) {
+
+        if (isGameOver) {
+            myGdxGame.screenRestart.gamePoints = gamePoints;
+            myGdxGame.setScreen(myGdxGame.screenRestart);
+        }
 
         if (Gdx.input.justTouched()) {
             bird.onClick();

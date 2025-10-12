@@ -1,22 +1,24 @@
-package io.github.some_example_name;
+package io.github.some_example_name.components;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+
+import io.github.some_example_name.MyGdxGame;
 
 public class MovingBackground {
 
     Texture texture;
 
     int texture1X, texture2X;
-    int speed = 2;
+    int speed = 3;
 
-    MovingBackground() {
+    public MovingBackground(String pathToTexture) {
         texture1X = 0;
         texture2X = MyGdxGame.SCR_WIDTH;
-        texture = new Texture("game_bg.png");
+        texture = new Texture(pathToTexture);
     }
 
-    void move() {
+    public void move() {
         texture1X -= speed;
         texture2X -= speed;
 
@@ -28,12 +30,12 @@ public class MovingBackground {
         }
     }
 
-    void draw(Batch batch) {
-        batch.draw(texture, texture1X, 0, MyGdxGame.SCR_WIDTH, MyGdxGame.SCR_HEIGHT);
-        batch.draw(texture, texture2X, 0, MyGdxGame.SCR_WIDTH, MyGdxGame.SCR_HEIGHT);
+    public void draw(Batch batch) {
+        batch.draw(texture, texture1X, 0, MyGdxGame.SCR_WIDTH + 2, MyGdxGame.SCR_HEIGHT);
+        batch.draw(texture, texture2X, 0, MyGdxGame.SCR_WIDTH + 2, MyGdxGame.SCR_HEIGHT);
     }
 
-    void dispose() {
+    public void dispose() {
         texture.dispose();
     }
 
