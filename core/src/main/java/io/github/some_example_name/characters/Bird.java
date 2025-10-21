@@ -9,21 +9,18 @@ public class Bird {
 
     int x, y;
     int width, height;
-
-    int speed;
-    int jumpHeight;
-    final int maxHeightOfJump = 100;
-    boolean jump = true;
-
+    float speedY;
+    private static final float gravity = -800f;
     int frameCounter;
     Texture[] framesArray;
 
-    public Bird(int x, int y, int speed, int width, int height) {
+    private static final float jump = 400f;
+    public Bird(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
-        this.speed = speed;
         this.width = width;
         this.height = height;
+        this.speedY = 0f;
         frameCounter = 0;
 
         framesArray = new Texture[]{
@@ -38,27 +35,32 @@ public class Bird {
         this.y = y;
     }
 
-    public void onClick() {
-        jump = true;
-        jumpHeight = maxHeightOfJump + y;
+    public void setSpeedY() {
+        this.speedY = 0f;
     }
 
-    public void fly() {
-        if (y >= jumpHeight) {
-            jump = false;
-        }
+    public void onClick() {
+        speedY = jump;
+    }
 
-        if (jump) {
-            y += speed;
-        } else {
-            y -= speed;
+    public void fly(float deltaTime) {
+        // v = v0 + a * t
+        speedY += gravity * deltaTime;
+
+        // y = y0 + v * t + 0.5 * a * t^2
+        y += speedY * deltaTime + (gravity * (deltaTime * deltaTime) / 2);
+
+        if (y + height < 0) {
+            y = -height;
+        }
+        if (y > SCR_HEIGHT) {
+            y = SCR_HEIGHT;
+            speedY = 0f;
         }
     }
 
     public boolean isInField() {
-        if (y + height < 0) return false;
-        if (y > SCR_HEIGHT) return false;
-        return true;
+        return y + height >= 0 && y <= SCR_HEIGHT;
     }
 
     public void draw(Batch batch) {
@@ -72,5 +74,4 @@ public class Bird {
             texture.dispose();
         }
     }
-
 }

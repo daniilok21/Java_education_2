@@ -20,7 +20,7 @@ public class Tube {
 
     boolean isPointReceived;
 
-    int speed = 10;
+    int speed = 20;
     final int width = 200;
     final int height = 700;
     int gapHeight = 400;
