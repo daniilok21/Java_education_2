@@ -29,6 +29,8 @@ public class ScreenGame implements Screen {
 
     int gamePoints;
     boolean isGameOver;
+    float timeTime = 0f;
+    private static final float frameTime = 1/60f;
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -51,34 +53,35 @@ public class ScreenGame implements Screen {
 
     @Override
     public void render(float delta) {
-
-        if (isGameOver) {
-            myGdxGame.screenRestart.gamePoints = gamePoints;
-            myGdxGame.setScreen(myGdxGame.screenRestart);
-        }
-
+        timeTime += delta;
         if (Gdx.input.justTouched()) {
             bird.onClick();
         }
+        while (timeTime >= frameTime) {
+            timeTime -= frameTime;
+            if (isGameOver) {
+                myGdxGame.screenRestart.gamePoints = gamePoints;
+                myGdxGame.setScreen(myGdxGame.screenRestart);
+            }
 
-        background.move();
-        bird.fly(delta);
-        if (!bird.isInField()) {
-            System.out.println("not in field");
-            isGameOver = true;
-        }
-        for (Tube tube : tubes) {
-            tube.move();
-            if (tube.isHit(bird)) {
+            background.move();
+            bird.fly(frameTime);
+            if (!bird.isInField()) {
+                System.out.println("not in field");
                 isGameOver = true;
-                System.out.println("hit");
-            } else if (tube.needAddPoint(bird)) {
-                gamePoints += 1;
-                tube.setPointReceived();
-                System.out.println(gamePoints);
+            }
+            for (Tube tube : tubes) {
+                tube.move();
+                if (tube.isHit(bird)) {
+                    isGameOver = true;
+                    System.out.println("hit");
+                } else if (tube.needAddPoint(bird)) {
+                    gamePoints += 1;
+                    tube.setPointReceived();
+                    System.out.println(gamePoints);
+                }
             }
         }
-
         ScreenUtils.clear(1, 0, 0, 1);
         myGdxGame.camera.update();
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
@@ -90,6 +93,7 @@ public class ScreenGame implements Screen {
         pointCounter.draw(myGdxGame.batch, gamePoints);
 
         myGdxGame.batch.end();
+
     }
 
     @Override
