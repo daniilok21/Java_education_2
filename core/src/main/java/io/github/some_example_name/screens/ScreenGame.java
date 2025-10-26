@@ -5,10 +5,12 @@ import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import io.github.some_example_name.MyGdxGame;
 import io.github.some_example_name.characters.Bird;
+import io.github.some_example_name.characters.Flower;
 import io.github.some_example_name.characters.Tube;
 import io.github.some_example_name.components.MovingBackground;
 import io.github.some_example_name.components.PointCounter;
@@ -23,12 +25,14 @@ public class ScreenGame implements Screen {
     Bird bird;
     PointCounter pointCounter;
     MovingBackground background;
+    Flower flower;
 
     int tubeCount = 3;
     Tube[] tubes;
 
     int gamePoints;
     boolean isGameOver;
+    boolean bossFight;
     float timeTime = 0f;
     private static final float frameTime = 1/60f;
 
@@ -39,6 +43,7 @@ public class ScreenGame implements Screen {
         background = new MovingBackground("backgrounds/game_bg.png");
         bird = new Bird(20, SCR_HEIGHT / 2, 250, 200);
         pointCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop);
+        flower = new Flower(0, SCR_HEIGHT + 128, 70, 130);
     }
 
 
@@ -46,8 +51,11 @@ public class ScreenGame implements Screen {
     public void show() {
         gamePoints = 0;
         isGameOver = false;
+        bossFight = false;
         bird.setY(SCR_HEIGHT / 2);
         bird.setSpeedY();
+        flower.setPos(0, SCR_HEIGHT + 128);
+        flower.swtichActiveFalse();
         initTubes();
     }
 
@@ -55,7 +63,17 @@ public class ScreenGame implements Screen {
     public void render(float delta) {
         timeTime += delta;
         if (Gdx.input.justTouched()) {
-            bird.onClick();
+            Vector3 touch = myGdxGame.camera.unproject(
+                new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)
+            );
+            if (flower.isHit((int) touch.x, (int) touch.y) && !bossFight) {
+                bossFight = true;
+                // ДОПИСАТЬ
+                System.out.println("ЦВЯТОЧЕК");
+            }
+            else {
+                bird.onClick();
+            }
         }
         while (timeTime >= frameTime) {
             timeTime -= frameTime;
@@ -72,6 +90,13 @@ public class ScreenGame implements Screen {
             }
             for (Tube tube : tubes) {
                 tube.move();
+                if (tube.getTubeIndex() == flower.getTargetTubeIndex()) {
+                    if (!flower.getIsActive()) {
+                        flower.swtichActiveTrue();
+                        flower.setPos(tube.getBottomTubeX() + tube.getTubeWidth() / 2 - 15, tube.getYForFlower());
+                    }
+                    flower.move();
+                }
                 if (tube.isHit(bird)) {
                     isGameOver = true;
                     System.out.println("hit");
@@ -88,6 +113,7 @@ public class ScreenGame implements Screen {
         myGdxGame.batch.begin();
 
         background.draw(myGdxGame.batch);
+        flower.draw(myGdxGame.batch);
         bird.draw(myGdxGame.batch);
         for (Tube tube : tubes) tube.draw(myGdxGame.batch);
         pointCounter.draw(myGdxGame.batch, gamePoints);
@@ -124,6 +150,7 @@ public class ScreenGame implements Screen {
         for (int i = 0; i < tubeCount; i++) {
             tubes[i].dispose();
         }
+        flower.dispose();
     }
 
     void initTubes() {

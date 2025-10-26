@@ -25,8 +25,10 @@ public class Tube {
     final int height = 700;
     int gapHeight = 400;
     int padding = 100;
+    private int tubeIndex;
 
     public Tube(int tubeCount, int tubeIdx) {
+        this.tubeIndex = tubeIdx;
         random = new Random();
 
         gapY = gapHeight / 2 + padding + random.nextInt(SCR_HEIGHT - 2 * (padding + gapHeight / 2));
@@ -50,23 +52,43 @@ public class Tube {
             isPointReceived = false;
             x = SCR_WIDTH + distanceBetweenTubes;
             gapY = gapHeight / 2 + padding + random.nextInt(SCR_HEIGHT - 2 * (padding + gapHeight / 2));
+            tubeIndex += 3;
         }
     }
 
     public boolean isHit(Bird bird) {
-
         // down tube collision
-        if (bird.y <= gapY - gapHeight / 2 && bird.x + bird.width >= x && bird.x <= x + width)
+        if (bird.y <= gapY - gapHeight / 2 && bird.x + bird.width >= x && bird.x <= x + width) {
             return true;
+        }
         // upper tube collision
-        if (bird.y + bird.height >= gapY + gapHeight / 2 && bird.x + bird.width >= x && bird.x <= x + width)
+        if (bird.y + bird.height >= gapY + gapHeight / 2 && bird.x + bird.width >= x && bird.x <= x + width) {
             return true;
+        }
 
         return false;
     }
 
+    public float getBottomTubeX() {
+        return x;
+    }
+    public float getBottomTubeY() {
+        return gapY - gapHeight / 2 - height;
+    }
+    public int getTubeWidth() {
+        return width;
+    }
+    public int getTubeHeight() {
+        return height;
+    }
+    public int getTubeIndex() {
+        return tubeIndex;
+    }
     public boolean needAddPoint(Bird bird) {
         return !isPointReceived && bird.x > x + width;
+    }
+    public int getYForFlower() {
+        return gapY - gapHeight / 2;
     }
 
     public void setPointReceived() {
