@@ -7,9 +7,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 
 import io.github.some_example_name.MyGdxGame;
 import io.github.some_example_name.characters.Bird;
+import io.github.some_example_name.characters.Boss;
 import io.github.some_example_name.characters.Flower;
 import io.github.some_example_name.characters.Tube;
 import io.github.some_example_name.components.MovingBackground;
@@ -26,6 +29,7 @@ public class ScreenGame implements Screen {
     PointCounter pointCounter;
     MovingBackground background;
     Flower flower;
+    Boss boss;
 
     int tubeCount = 3;
     Tube[] tubes;
@@ -35,6 +39,8 @@ public class ScreenGame implements Screen {
     boolean bossFight;
     float timeTime = 0f;
     private static final float frameTime = 1/60f;
+    Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/death.mp3"));
+    Music backgroundMusic;
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -44,6 +50,11 @@ public class ScreenGame implements Screen {
         bird = new Bird(20, SCR_HEIGHT / 2, 250, 200);
         pointCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop);
         flower = new Flower(0, SCR_HEIGHT + 128, 70, 130);
+        boss = new Boss(0, SCR_HEIGHT + 128, 128, 128);
+
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/jumper.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.5f); // 0.0f - 1.0f
     }
 
 
@@ -56,7 +67,9 @@ public class ScreenGame implements Screen {
         bird.setSpeedY();
         flower.setPos(0, SCR_HEIGHT + 128);
         flower.swtichActiveFalse();
+        boss.setPosition(0, SCR_HEIGHT + 128);
         initTubes();
+        backgroundMusic.play();
     }
 
     @Override
@@ -70,6 +83,7 @@ public class ScreenGame implements Screen {
                 bossFight = true;
                 // ДОПИСАТЬ
                 System.out.println("ЦВЯТОЧЕК");
+                boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
             }
             else {
                 bird.onClick();
@@ -78,6 +92,8 @@ public class ScreenGame implements Screen {
         while (timeTime >= frameTime) {
             timeTime -= frameTime;
             if (isGameOver) {
+                deathSound.play();
+                backgroundMusic.stop();
                 myGdxGame.screenRestart.gamePoints = gamePoints;
                 myGdxGame.setScreen(myGdxGame.screenRestart);
             }
@@ -114,6 +130,7 @@ public class ScreenGame implements Screen {
 
         background.draw(myGdxGame.batch);
         flower.draw(myGdxGame.batch);
+        boss.draw(myGdxGame.batch);
         bird.draw(myGdxGame.batch);
         for (Tube tube : tubes) tube.draw(myGdxGame.batch);
         pointCounter.draw(myGdxGame.batch, gamePoints);
@@ -151,6 +168,9 @@ public class ScreenGame implements Screen {
             tubes[i].dispose();
         }
         flower.dispose();
+        boss.dispose();
+        deathSound.dispose();
+        backgroundMusic.dispose();
     }
 
     void initTubes() {

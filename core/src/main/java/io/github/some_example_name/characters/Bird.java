@@ -63,6 +63,21 @@ public class Bird {
         return y + height >= 0 && y <= SCR_HEIGHT;
     }
 
+    public int getX() {
+        return x;
+    }
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public void draw(Batch batch) {
         int frameMultiplier = 10;
         batch.draw(framesArray[frameCounter / frameMultiplier], x, y, width, height);

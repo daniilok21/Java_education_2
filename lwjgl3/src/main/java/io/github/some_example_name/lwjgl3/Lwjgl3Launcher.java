@@ -7,7 +7,7 @@ import io.github.some_example_name.MyGdxGame;
 public class Lwjgl3Launcher {
     public static void main(String[] arg) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setForegroundFPS(90);
+        config.setForegroundFPS(60);
         config.setWindowedMode(1280, 720);
         config.setTitle("FlappyBird");
         new Lwjgl3Application(new MyGdxGame(), config);
