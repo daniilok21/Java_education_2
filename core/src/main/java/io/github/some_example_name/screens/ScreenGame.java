@@ -84,6 +84,9 @@ public class ScreenGame implements Screen {
                 // ДОПИСАТЬ
                 System.out.println("ЦВЯТОЧЕК");
                 boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
+                for (int i = 0; i < tubeCount; i++) {
+                    tubes[i].dispose();
+                }
             }
             else {
                 bird.onClick();
@@ -113,7 +116,7 @@ public class ScreenGame implements Screen {
                     }
                     flower.move();
                 }
-                if (tube.isHit(bird)) {
+                if (tube.isHit(bird) && !bossFight) {
                     isGameOver = true;
                     System.out.println("hit");
                 } else if (tube.needAddPoint(bird)) {
@@ -132,7 +135,9 @@ public class ScreenGame implements Screen {
         flower.draw(myGdxGame.batch);
         boss.draw(myGdxGame.batch);
         bird.draw(myGdxGame.batch);
-        for (Tube tube : tubes) tube.draw(myGdxGame.batch);
+        if (!bossFight) {
+            for (Tube tube : tubes) tube.draw(myGdxGame.batch);
+        }
         pointCounter.draw(myGdxGame.batch, gamePoints);
 
         myGdxGame.batch.end();

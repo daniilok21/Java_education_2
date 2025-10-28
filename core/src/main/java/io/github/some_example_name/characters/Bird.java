@@ -60,7 +60,7 @@ public class Bird {
     }
 
     public boolean isInField() {
-        return y + height >= 0 && y <= SCR_HEIGHT;
+        return y + height > 0 && y < SCR_HEIGHT;
     }
 
     public int getX() {
