@@ -37,6 +37,7 @@ public class ScreenGame implements Screen {
     int gamePoints;
     boolean isGameOver;
     boolean bossFight;
+
     float timeTime = 0f;
     private static final float frameTime = 1/60f;
     Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/death.mp3"));
@@ -50,7 +51,7 @@ public class ScreenGame implements Screen {
         bird = new Bird(20, SCR_HEIGHT / 2, 250, 200);
         pointCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop);
         flower = new Flower(0, SCR_HEIGHT + 128, 70, 130);
-        boss = new Boss(0, SCR_HEIGHT + 128, 128, 128);
+        boss = new Boss(0, 0, 128, 128);
 
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/jumper.mp3"));
         backgroundMusic.setLooping(true);
@@ -67,7 +68,7 @@ public class ScreenGame implements Screen {
         bird.setSpeedY();
         flower.setPos(0, SCR_HEIGHT + 128);
         flower.swtichActiveFalse();
-        boss.setPosition(0, SCR_HEIGHT + 128);
+        boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
         initTubes();
         backgroundMusic.play();
     }
@@ -83,7 +84,6 @@ public class ScreenGame implements Screen {
                 bossFight = true;
                 // ДОПИСАТЬ
                 System.out.println("ЦВЯТОЧЕК");
-                boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
                 for (int i = 0; i < tubeCount; i++) {
                     tubes[i].dispose();
                 }
@@ -132,13 +132,15 @@ public class ScreenGame implements Screen {
         myGdxGame.batch.begin();
 
         background.draw(myGdxGame.batch);
-        flower.draw(myGdxGame.batch);
-        boss.draw(myGdxGame.batch);
         bird.draw(myGdxGame.batch);
         if (!bossFight) {
             for (Tube tube : tubes) tube.draw(myGdxGame.batch);
+            flower.draw(myGdxGame.batch);
+            pointCounter.draw(myGdxGame.batch, gamePoints);
         }
-        pointCounter.draw(myGdxGame.batch, gamePoints);
+        else {
+            boss.draw(myGdxGame.batch);
+        }
 
         myGdxGame.batch.end();
 
