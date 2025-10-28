@@ -29,7 +29,9 @@ public class MovingBackground {
             texture2X = MyGdxGame.SCR_WIDTH;
         }
     }
-
+    public void changeBG(String pathToTexture) {
+        texture = new Texture(pathToTexture);
+    }
     public void draw(Batch batch) {
         batch.draw(texture, texture1X, 0, MyGdxGame.SCR_WIDTH, MyGdxGame.SCR_HEIGHT);
         batch.draw(texture, texture2X, 0, MyGdxGame.SCR_WIDTH, MyGdxGame.SCR_HEIGHT);

@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.github.some_example_name.MyGdxGame;
 import io.github.some_example_name.characters.Bird;
@@ -36,9 +38,13 @@ public class ScreenGame implements Screen {
 
     int gamePoints;
     boolean isGameOver;
+    boolean bossTransition;
     boolean bossFight;
 
     float timeTime = 0f;
+    private Timer timer;
+    boolean firstTask = true;
+    boolean task1Compleated = false;
     private static final float frameTime = 1/60f;
     Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/death.mp3"));
     Music backgroundMusic;
@@ -57,13 +63,42 @@ public class ScreenGame implements Screen {
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.5f); // 0.0f - 1.0f
     }
-
+    public void startTimer(int timee, int idOfTask) {
+        // 1 - смена бг для боссфайта
+        // 2 - боссфайт
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (firstTask) {
+                    firstTask = false;
+                }
+                else {
+                    switch (idOfTask) {
+                        case (1):
+                            task1Compleated = true;
+                        case (2):
+                            bossFight = true;
+                    }
+                    firstTask = true;
+                    stopTimer();
+                }
+            }
+        }, 0, timee); // Интервал в timee миллисекунд (timee / 1000 секунд)
+    }
+    public void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+        }
+    }
 
     @Override
     public void show() {
         gamePoints = 0;
         isGameOver = false;
+        bossTransition = false;
         bossFight = false;
+        task1Compleated = false;
         bird.setY(SCR_HEIGHT / 2);
         bird.setSpeedY();
         flower.setPos(0, SCR_HEIGHT + 128);
@@ -71,6 +106,7 @@ public class ScreenGame implements Screen {
         boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
         initTubes();
         backgroundMusic.play();
+        background.changeBG("backgrounds/game_bg.png");
     }
 
     @Override
@@ -80,13 +116,16 @@ public class ScreenGame implements Screen {
             Vector3 touch = myGdxGame.camera.unproject(
                 new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)
             );
-            if (flower.isHit((int) touch.x, (int) touch.y) && !bossFight) {
-                bossFight = true;
+            if (flower.isHit((int) touch.x, (int) touch.y) && !bossTransition) {
+                bossTransition = true;
                 // ДОПИСАТЬ
                 System.out.println("ЦВЯТОЧЕК");
                 for (int i = 0; i < tubeCount; i++) {
                     tubes[i].dispose();
                 }
+                background.changeBG("backgrounds/transition_bg.png");
+                backgroundMusic.stop();
+                startTimer(5000, 1);
             }
             else {
                 bird.onClick();
@@ -116,13 +155,25 @@ public class ScreenGame implements Screen {
                     }
                     flower.move();
                 }
-                if (tube.isHit(bird) && !bossFight) {
+                if (tube.isHit(bird) && !bossTransition && !bossFight) {
                     isGameOver = true;
                     System.out.println("hit");
                 } else if (tube.needAddPoint(bird)) {
                     gamePoints += 1;
                     tube.setPointReceived();
                     System.out.println(gamePoints);
+                }
+            }
+            if (bossFight) {
+                if (bossTransition) {
+                    background.changeBG("backgrounds/boss_bg.png");
+                    bossTransition = false;
+                }
+            }
+            else if (bossTransition) {
+                if (task1Compleated) {
+                    background.changeBG("backgrounds/game_bg.png");
+                    task1Compleated = false;
                 }
             }
         }
@@ -132,13 +183,19 @@ public class ScreenGame implements Screen {
         myGdxGame.batch.begin();
 
         background.draw(myGdxGame.batch);
-        bird.draw(myGdxGame.batch);
-        if (!bossFight) {
+        if (!(bossTransition || bossFight)) {
             for (Tube tube : tubes) tube.draw(myGdxGame.batch);
             flower.draw(myGdxGame.batch);
             pointCounter.draw(myGdxGame.batch, gamePoints);
         }
+        if (!bossTransition ) {
+            bird.draw(myGdxGame.batch);
+        }
         else {
+            bird.setY(SCR_HEIGHT / 2);
+            bird.setSpeedY();
+        }
+        if (bossFight) {
             boss.draw(myGdxGame.batch);
         }
 
