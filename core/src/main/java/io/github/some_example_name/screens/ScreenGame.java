@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -50,6 +52,10 @@ public class ScreenGame implements Screen {
     private static final float frameTime = 1/60f;
     Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/death.mp3"));
     Music backgroundMusic;
+    float fpsTimer = 0f;
+    final float fpsLogInterval = 1f;
+    private BitmapFont fpsFont;
+    int currentFPS = 0;
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -64,6 +70,9 @@ public class ScreenGame implements Screen {
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/jumper.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.5f); // 0.0f - 1.0f
+        this.fpsFont = new BitmapFont();
+        this.fpsFont.setColor(Color.WHITE);
+        this.fpsFont.getData().setScale(1.0f);
     }
     public void startTimer(int timee, int idOfTask) {
         // 1 - смена бг для боссфайта
@@ -110,11 +119,17 @@ public class ScreenGame implements Screen {
         initTubes();
         backgroundMusic.play();
         background.changeBG("backgrounds/game_bg.png");
+        fpsTimer = 0f;
     }
 
     @Override
     public void render(float delta) {
         timeTime += delta;
+        fpsTimer += delta;
+        if (fpsTimer >= fpsLogInterval) {
+            currentFPS = Gdx.graphics.getFramesPerSecond();
+            fpsTimer = 0f;
+        }
         if (Gdx.input.justTouched()) {
             Vector3 touch = myGdxGame.camera.unproject(
                 new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)
@@ -211,6 +226,10 @@ public class ScreenGame implements Screen {
         if (bossFight) {
             boss.draw(myGdxGame.batch);
         }
+
+        float fontHeight = fpsFont.getData().capHeight - 10;
+        fpsFont.draw(myGdxGame.batch, "FPS: " + currentFPS, 0, SCR_HEIGHT - fontHeight);
+
         myGdxGame.batch.end();
         if (bossFight) {
             shapeRenderer.setProjectionMatrix(myGdxGame.camera.combined);
@@ -263,6 +282,7 @@ public class ScreenGame implements Screen {
         deathSound.dispose();
         backgroundMusic.dispose();
         shapeRenderer.dispose();
+        fpsFont.dispose();
     }
 
     void initTubes() {
