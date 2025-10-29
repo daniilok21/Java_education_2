@@ -5,6 +5,7 @@ import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.audio.Sound;
@@ -32,7 +33,7 @@ public class ScreenGame implements Screen {
     MovingBackground background;
     Flower flower;
     Boss boss;
-
+    private ShapeRenderer shapeRenderer;
     int tubeCount = 3;
     Tube[] tubes;
 
@@ -58,7 +59,7 @@ public class ScreenGame implements Screen {
         pointCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop);
         flower = new Flower(0, SCR_HEIGHT + 128, 70, 130);
         boss = new Boss(0, 0, 128, 128);
-
+        this.shapeRenderer = new ShapeRenderer();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/jumper.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.5f); // 0.0f - 1.0f
@@ -104,6 +105,7 @@ public class ScreenGame implements Screen {
         flower.setPos(0, SCR_HEIGHT + 128);
         flower.swtichActiveFalse();
         boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
+        boss.resetLasers();
         initTubes();
         backgroundMusic.play();
         background.changeBG("backgrounds/game_bg.png");
@@ -151,7 +153,7 @@ public class ScreenGame implements Screen {
                 if (tube.getTubeIndex() == flower.getTargetTubeIndex()) {
                     if (!flower.getIsActive()) {
                         flower.swtichActiveTrue();
-                        flower.setPos(tube.getBottomTubeX() + tube.getTubeWidth() / 2 - 15, tube.getYForFlower());
+                        flower.setPos(tube.getBottomTubeX() + tube.getTubeWidth() / 2f - 15, tube.getYForFlower());
                     }
                     flower.move();
                 }
@@ -165,9 +167,19 @@ public class ScreenGame implements Screen {
                 }
             }
             if (bossFight) {
+                if (boss.getLasersCollisionActive()) {
+                    boss.updateLasers(frameTime);
+                }
+                if (boss.checkLaserCollision(bird)) {
+                    System.out.println("Laser hit!");
+                    isGameOver = true;
+                }
                 if (bossTransition) {
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
+                    boss.initializeLasers();
+                    boss.enableLaserCollision();
+                    System.out.println("Подготовка к боссфайту завершена!");
                 }
             }
             else if (bossTransition) {
@@ -180,8 +192,8 @@ public class ScreenGame implements Screen {
         ScreenUtils.clear(1, 0, 0, 1);
         myGdxGame.camera.update();
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
-        myGdxGame.batch.begin();
 
+        myGdxGame.batch.begin();
         background.draw(myGdxGame.batch);
         if (!(bossTransition || bossFight)) {
             for (Tube tube : tubes) tube.draw(myGdxGame.batch);
@@ -198,9 +210,13 @@ public class ScreenGame implements Screen {
         if (bossFight) {
             boss.draw(myGdxGame.batch);
         }
-
         myGdxGame.batch.end();
-
+        if (bossFight) {
+            shapeRenderer.setProjectionMatrix(myGdxGame.camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            boss.renderLasers(shapeRenderer);
+            shapeRenderer.end();
+        }
     }
 
     @Override
@@ -235,6 +251,7 @@ public class ScreenGame implements Screen {
         boss.dispose();
         deathSound.dispose();
         backgroundMusic.dispose();
+        shapeRenderer.dispose();
     }
 
     void initTubes() {
@@ -243,5 +260,4 @@ public class ScreenGame implements Screen {
             tubes[i] = new Tube(tubeCount, i);
         }
     }
-
 }
