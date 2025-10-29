@@ -3,6 +3,7 @@ package io.github.some_example_name.screens;
 import static io.github.some_example_name.MyGdxGame.SCR_HEIGHT;
 import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -217,8 +218,18 @@ public class ScreenGame implements Screen {
             boss.renderLasers(shapeRenderer);
             shapeRenderer.end();
         }
+        // showHitboxes();
     }
 
+    private void showHitboxes() {
+        shapeRenderer.setProjectionMatrix(myGdxGame.camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(bird.getHeadX(), bird.getHeadY(), bird.getHeadWidth(), bird.getHeadHeight());
+        shapeRenderer.setColor(Color.BLUE);
+        shapeRenderer.rect(bird.getBodyX(), bird.getBodyY(), bird.getBodyWidth(), bird.getBodyHeight());
+        shapeRenderer.end();
+    }
     @Override
     public void resize(int width, int height) {
 

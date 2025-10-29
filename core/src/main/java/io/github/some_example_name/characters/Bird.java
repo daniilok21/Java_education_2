@@ -13,6 +13,10 @@ public class Bird {
     private static final float gravity = -800f;
     int frameCounter;
     Texture[] framesArray;
+    private float headX, headY, headWidth, headHeight;
+    private float bodyX, bodyY, bodyWidth, bodyHeight;
+    private float headOffsetXRel, headOffsetYRel;
+    private float bodyOffsetXRel, bodyOffsetYRel;
 
     private static final float jump = 400f;
     public Bird(int x, int y, int width, int height) {
@@ -29,10 +33,23 @@ public class Bird {
             new Texture("birdTiles/bird2.png"),
             new Texture("birdTiles/bird1.png"),
         };
+        this.headOffsetXRel = 0.55f;
+        this.headOffsetYRel = 0.4f;
+        this.bodyOffsetXRel = 0.0f;
+        this.bodyOffsetYRel = 0.0f;
+        this.headWidth = 0.375f * width;
+        this.headHeight = 0.5f * height;
+        this.bodyWidth = 0.75f * width;
+        this.bodyHeight = 0.9f * height;
+        this.headX = this.x + this.headOffsetXRel * this.width;
+        this.headY = this.y + this.headOffsetYRel * this.height;
+        this.bodyX = this.x + this.bodyOffsetXRel * this.width;
+        this.bodyY = this.y + this.bodyOffsetYRel * this.height;
     }
 
     public void setY(int y) {
         this.y = y;
+        updateHitboxes();
     }
 
     public void setSpeedY() {
@@ -57,8 +74,14 @@ public class Bird {
             y = SCR_HEIGHT;
             speedY = 0f;
         }
+        updateHitboxes();
     }
-
+    private void updateHitboxes() {
+        this.headX = this.x + this.headOffsetXRel * this.width;
+        this.headY = this.y + this.headOffsetYRel * this.height;
+        this.bodyX = this.x + this.bodyOffsetXRel * this.width;
+        this.bodyY = this.y + this.bodyOffsetYRel * this.height;
+    }
     public boolean isInField() {
         return y + height > 0 && y < SCR_HEIGHT;
     }
@@ -77,6 +100,15 @@ public class Bird {
     public int getHeight() {
         return height;
     }
+
+    public float getHeadX() { return headX; }
+    public float getHeadY() { return headY; }
+    public float getHeadWidth() { return headWidth; }
+    public float getHeadHeight() { return headHeight; }
+    public float getBodyX() { return bodyX; }
+    public float getBodyY() { return bodyY; }
+    public float getBodyWidth() { return bodyWidth; }
+    public float getBodyHeight() { return bodyHeight; }
 
     public void draw(Batch batch) {
         int frameMultiplier = 10;

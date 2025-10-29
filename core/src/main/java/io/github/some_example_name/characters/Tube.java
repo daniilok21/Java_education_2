@@ -57,15 +57,18 @@ public class Tube {
     }
 
     public boolean isHit(Bird bird) {
-        // down tube collision
-        if (bird.y <= gapY - gapHeight / 2 && bird.x + bird.width >= x && bird.x <= x + width) {
+        if (bird.getHeadY() <= gapY - gapHeight / 2 && bird.getHeadX() + bird.getHeadWidth() >= x && bird.getHeadX() <= x + width) {
             return true;
         }
-        // upper tube collision
-        if (bird.y + bird.height >= gapY + gapHeight / 2 && bird.x + bird.width >= x && bird.x <= x + width) {
+        if (bird.getHeadY() + bird.getHeadHeight() >= gapY + gapHeight / 2 && bird.getHeadX() + bird.getHeadWidth() >= x && bird.getHeadX() <= x + width) {
             return true;
         }
-
+        if (bird.getBodyY() <= gapY - gapHeight / 2 && bird.getBodyX() + bird.getBodyWidth() >= x && bird.getBodyX() <= x + width) {
+            return true;
+        }
+        if (bird.getBodyY() + bird.getBodyHeight() >= gapY + gapHeight / 2 && bird.getBodyX() + bird.getBodyWidth() >= x && bird.getBodyX() <= x + width) {
+            return true;
+        }
         return false;
     }
 

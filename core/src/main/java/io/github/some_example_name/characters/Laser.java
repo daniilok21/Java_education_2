@@ -48,27 +48,21 @@ public class Laser {
         return k == targetK;
     }
     public boolean isHit(Bird bird) {
-        float birdCheckX, birdCheckY;
-
-        if (isUpperLaser) {
-            birdCheckX = bird.getX() + bird.getWidth();
-            birdCheckY = bird.getY() + bird.getHeight();
+        if (checkCollisionWithLaser(bird.getHeadX(), bird.getHeadY(), bird.getHeadWidth(), bird.getHeadHeight())) {
+            return true;
         }
-        else {
-            birdCheckX = bird.getX() + bird.getWidth();
-            birdCheckY = bird.getY();
-        }
-
-        float laserYwhithColX = k * birdCheckX + b;
-
+        return checkCollisionWithLaser(bird.getBodyX(), bird.getBodyY(), bird.getBodyWidth(), bird.getBodyHeight());
+    }
+    private boolean checkCollisionWithLaser(float rectX, float rectY, float rectWidth, float rectHeight) {
+        float rectRightX = rectX + rectWidth;
         if (isUpperLaser) {
             if (k < 0) {
-                return birdCheckY > laserYwhithColX;
+                return rectY + rectHeight > k * rectRightX + b;
             }
         }
         else {
             if (k > 0) {
-                return birdCheckY < laserYwhithColX;
+                return rectY < k * rectRightX + b;
             }
         }
         return false;
