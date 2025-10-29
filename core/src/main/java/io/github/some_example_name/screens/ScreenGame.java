@@ -177,7 +177,7 @@ public class ScreenGame implements Screen {
                 if (bossTransition) {
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
-                    boss.initializeLasers();
+                    boss.initLasers(-30, -10, 30, 10, 0.1f);
                     boss.enableLaserCollision();
                     System.out.println("Подготовка к боссфайту завершена!");
                 }

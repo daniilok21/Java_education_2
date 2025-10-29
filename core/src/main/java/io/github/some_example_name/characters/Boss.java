@@ -12,10 +12,11 @@ public class Boss {
     private Laser upperLaser;
     private Laser lowerLaser;
     private float laserEndX;
-    private static final float LASER_CHANGE_SPEED = 0.1f;
+    private static float LASER_CHANGE_SPEED = 0.1f;
     private boolean lasersInited = false;
     private boolean lasersRenderActive = false;
     private boolean lasersCollisionActive = false;
+    private boolean lasersVisible = true;
     public Boss(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -27,25 +28,19 @@ public class Boss {
         this.lasersCollisionActive = false;
     }
     public void resetLasers() {
-        if (upperLaser != null) {
-            upperLaser = null;
-        }
-        if (lowerLaser != null) {
-            lowerLaser = null;
-        }
+        upperLaser = null;
+        lowerLaser = null;
         this.lasersInited = false;
         this.lasersRenderActive = false;
         this.lasersCollisionActive = false;
+        this.lasersVisible = true;
     }
-    public void initializeLasers() {
+    public void initLasers(float initUpperAngle, float targetUpperAngle, float initLowerAngle, float targetLowerAngle, float speed) {
+        // default: -30, -10, 30, 10;
         resetLasers();
         float laserStartX = this.x + this.width / 2.0f;
         float laserStartY = this.y + this.height / 2.0f;
-        float initUpperAngle = -30.0f;
-        float targetUpperAngle = -10.0f;
-        float initLowerAngle = 30.0f;
-        float targetLowerAngle = 10.0f;
-
+        this.LASER_CHANGE_SPEED = speed;
         this.upperLaser = new Laser(laserStartX, laserStartY, initUpperAngle, targetUpperAngle, LASER_CHANGE_SPEED, laserEndX, true);
         this.lowerLaser = new Laser(laserStartX, laserStartY, initLowerAngle, targetLowerAngle, LASER_CHANGE_SPEED, laserEndX, false);
         this.lasersInited = true;
@@ -57,14 +52,30 @@ public class Boss {
             this.lasersCollisionActive = true;
         }
     }
+    public void setLasersVisible(boolean visible) {
+        this.lasersVisible = visible;
+    }
+    public void disableLasers() {
+        setLasersVisible(false);
+        disableLaserCollision();
+    }
+    public void disableLaserCollision() {
+        this.lasersCollisionActive = false;
+    }
     public boolean getLasersCollisionActive() {
         return this.lasersCollisionActive;
     }
     public void draw(Batch batch) {
         batch.draw(texture, x, y, width, height);
     }
-    public void renderLasers(ShapeRenderer shapeRenderer) {
+    public boolean isKofLaserEqualTargetK() {
         if (lasersRenderActive && lasersInited) {
+            return upperLaser.isKequalTargetK();
+        }
+        return false;
+    }
+    public void renderLasers(ShapeRenderer shapeRenderer) {
+        if (lasersRenderActive && lasersInited && lasersVisible) {
             upperLaser.setBossPos(this.x + this.width / 2.0f, this.y + this.height / 2.0f);
             lowerLaser.setBossPos(this.x + this.width / 2.0f, this.y + this.height / 2.0f);
 
@@ -91,7 +102,9 @@ public class Boss {
     public float getY() {
         return y;
     }
-
+    public boolean isLasersVisible() {
+        return this.lasersVisible;
+    }
     public Texture getTexture() {
         return texture;
     }

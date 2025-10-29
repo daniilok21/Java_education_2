@@ -44,6 +44,9 @@ public class Laser {
         this.b = this.bossY - this.k * this.startX;
         this.startX = bossX;
     }
+    public boolean isKequalTargetK() {
+        return k == targetK;
+    }
     public boolean isHit(Bird bird) {
         float birdCheckX, birdCheckY;
 
