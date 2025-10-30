@@ -19,6 +19,7 @@ import java.util.TimerTask;
 import io.github.some_example_name.MyGdxGame;
 import io.github.some_example_name.characters.Bird;
 import io.github.some_example_name.characters.Boss;
+import io.github.some_example_name.characters.Fireball;
 import io.github.some_example_name.characters.Flower;
 import io.github.some_example_name.characters.Tube;
 import io.github.some_example_name.components.MovingBackground;
@@ -190,11 +191,14 @@ public class ScreenGame implements Screen {
                     System.out.println("Laser hit!");
                     isGameOver = true;
                 }
+                if (boss.checkFireballCollision(bird)) {
+                    System.out.println("HOOG");
+                }
                 if (bossTransition) {
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
-                    boss.initLasers(-30, -10, 30, 10, 0.1f);
-                    boss.enableLaserCollision();
+                    boss.initFireball(1);
+                    // boss.initLasers(-30, -10, 30, 10, 0.1f);
                     System.out.println("Подготовка к боссфайту завершена!");
                 }
             }
@@ -225,6 +229,7 @@ public class ScreenGame implements Screen {
         }
         if (bossFight) {
             boss.draw(myGdxGame.batch);
+            boss.renderFireball(myGdxGame.batch);
         }
 
         float fontHeight = fpsFont.getData().capHeight - 10;
@@ -235,6 +240,7 @@ public class ScreenGame implements Screen {
             shapeRenderer.setProjectionMatrix(myGdxGame.camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             boss.renderLasers(shapeRenderer);
+
             shapeRenderer.end();
         }
         // showHitboxes();
