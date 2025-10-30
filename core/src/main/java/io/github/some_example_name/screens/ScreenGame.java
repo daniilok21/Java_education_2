@@ -52,7 +52,9 @@ public class ScreenGame implements Screen {
     boolean task1Compleated = false;
     private static final float frameTime = 1/60f;
     Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/death.mp3"));
+    Sound transitionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/transition.mp3"));
     Music backgroundMusic;
+    Music bossFightMusic;
     float fpsTimer = 0f;
     final float fpsLogInterval = 1f;
     private BitmapFont fpsFont;
@@ -69,15 +71,17 @@ public class ScreenGame implements Screen {
         boss = new Boss(0, 0, 128, 128);
         this.shapeRenderer = new ShapeRenderer();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/jumper.mp3"));
+        bossFightMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/boss_fight.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.5f); // 0.0f - 1.0f
+        bossFightMusic.setVolume(0.5f); // 0.0f - 1.0f
         this.fpsFont = new BitmapFont();
         this.fpsFont.setColor(Color.WHITE);
         this.fpsFont.getData().setScale(1.0f);
     }
     public void startTimer(int timee, int idOfTask) {
-        // 1 - смена бг для боссфайта
-        // 2 - боссфайт
+        // 1 - смена бг для боссфайта + боссфайт + фаеры
+        // 2 - лазеры
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -86,11 +90,14 @@ public class ScreenGame implements Screen {
                     firstTask = false;
                 }
                 else {
-                    switch (idOfTask) {
-                        case (1):
-                            task1Compleated = true;
-                        case (2):
-                            bossFight = true;
+                    System.out.println("ID = " + idOfTask);
+                    if (idOfTask == 1) {
+                        task1Compleated = true;
+                        bossFight = true;
+                    }
+                    else if (idOfTask == 2) {
+                        boss.initLasers(-30f, -10f, 30f, 10f, 0.1f);
+                        System.out.println("HELLO");
                     }
                     firstTask = true;
                     stopTimer();
@@ -145,7 +152,8 @@ public class ScreenGame implements Screen {
                 }
                 background.changeBG("backgrounds/transition_bg.png");
                 backgroundMusic.stop();
-                startTimer(5000, 1);
+                startTimer(2700, 1);
+                transitionSound.play();
             }
             else {
                 bird.onClick();
@@ -156,6 +164,7 @@ public class ScreenGame implements Screen {
             if (isGameOver) {
                 deathSound.play();
                 backgroundMusic.stop();
+                bossFightMusic.stop();
                 myGdxGame.screenRestart.gamePoints = gamePoints;
                 myGdxGame.setScreen(myGdxGame.screenRestart);
             }
@@ -197,11 +206,13 @@ public class ScreenGame implements Screen {
                     isGameOver = true;
                 }
                 if (bossTransition) {
+                    bossFightMusic.play();
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
-                    // boss.initFireball(0);
-                    // boss.initFireball(1);
-                    // boss.initFireball(2);
+                    boss.initFireball(0);
+                    boss.initFireball(1);
+                    boss.initFireball(2);
+                    startTimer(5000, 2);
                     // boss.initFireball(3);
                     // boss.initFireball(4);
                     // boss.initLasers(-30, -10, 30, 10, 0.1f);

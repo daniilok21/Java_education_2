@@ -69,7 +69,7 @@ public class Boss {
         this.lasersVisible = true;
     }
     public void initLasers(float initUpperAngle, float targetUpperAngle, float initLowerAngle, float targetLowerAngle, float speed) {
-        // default: -30, -10, 30, 10;
+        // default: -30f, -10f, 30f, 10f, 0.1f;
         resetLasers();
         float laserStartX = this.x + this.width / 2.0f;
         float laserStartY = this.y + this.height / 2.0f;
