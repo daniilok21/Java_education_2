@@ -3,6 +3,7 @@ package io.github.some_example_name.characters;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 
 public class Boss {
 
@@ -11,14 +12,13 @@ public class Boss {
     private int width, height;
     private Laser upperLaser;
     private Laser lowerLaser;
-    private Fireball fireball;
     private float laserEndX;
     private static float LASER_CHANGE_SPEED = 0.1f;
     private boolean lasersInited = false;
     private boolean lasersRenderActive = false;
     private boolean lasersCollisionActive = false;
     private boolean lasersVisible = true;
-    private boolean fireballInited;
+    private Array<Fireball> fireballArray;
     public Boss(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -28,23 +28,37 @@ public class Boss {
         this.lasersInited = false;
         this.lasersRenderActive = false;
         this.lasersCollisionActive = false;
-        this.fireballInited = false;
+        this.fireballArray = new Array<Fireball>();
     }
     public void renderFireball(Batch batch) {
-        if (fireballInited) {
+        for (int i = fireballArray.size - 1; i >= 0; i--) {
+            Fireball fireball = fireballArray.get(i);
             fireball.move();
-            fireball.draw(batch);
+            if (fireball.getX() + fireball.getWidth() < 0) {
+                fireball.dispose();
+                fireballArray.removeIndex(i);
+            } else {
+                fireball.draw(batch);
+            }
         }
     }
     public boolean checkFireballCollision(Bird bird) {
-        if (fireballInited) {
-            return fireball.isHit(bird);
+        for (Fireball fireball : fireballArray) {
+            if (fireball.isHit(bird)) {
+                return true;
+            }
         }
         return false;
     }
     public void initFireball(int id) {
-        this.fireball = new Fireball(id);
-        fireballInited = true;
+        Fireball fireball = new Fireball(id);
+        fireballArray.add(fireball);
+    }
+    public void resetFireballs() {
+        for (Fireball fireball : fireballArray) {
+            fireball.dispose();
+        }
+        fireballArray.clear();
     }
     public void resetLasers() {
         upperLaser = null;

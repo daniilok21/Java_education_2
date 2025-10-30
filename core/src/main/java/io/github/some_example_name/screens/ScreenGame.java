@@ -117,6 +117,7 @@ public class ScreenGame implements Screen {
         flower.swtichActiveFalse();
         boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
         boss.resetLasers();
+        boss.resetFireballs();
         initTubes();
         backgroundMusic.play();
         background.changeBG("backgrounds/game_bg.png");
@@ -192,12 +193,17 @@ public class ScreenGame implements Screen {
                     isGameOver = true;
                 }
                 if (boss.checkFireballCollision(bird)) {
-                    System.out.println("HOOG");
+                    System.out.println("Fireball hit!");
+                    isGameOver = true;
                 }
                 if (bossTransition) {
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
-                    boss.initFireball(1);
+                    // boss.initFireball(0);
+                    // boss.initFireball(1);
+                    // boss.initFireball(2);
+                    // boss.initFireball(3);
+                    // boss.initFireball(4);
                     // boss.initLasers(-30, -10, 30, 10, 0.1f);
                     System.out.println("Подготовка к боссфайту завершена!");
                 }
@@ -243,7 +249,7 @@ public class ScreenGame implements Screen {
 
             shapeRenderer.end();
         }
-        // showHitboxes();
+        showHitboxes();
     }
 
     private void showHitboxes() {

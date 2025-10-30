@@ -20,8 +20,8 @@ public class Fireball {
     public Fireball(int fireIndex) {
         this.texture = new Texture("fireball/fireball.png");
         this.x = SCR_WIDTH;
-        this.y = SCR_HEIGHT / 3f * fireIndex;
-        this.width = SCR_HEIGHT / 3 * 2;
+        this.y = SCR_HEIGHT / 5f * fireIndex;
+        this.width = SCR_HEIGHT / 5 * 2;
         this.height = width / 2;
         this.fireIndex = fireIndex;
     }
@@ -38,14 +38,21 @@ public class Fireball {
     }
 
     public boolean isHit(Bird bird) {
-        if (bird.getBodyX() + bird.getBodyHeight() >= x && bird.getBodyX() <= x + width) {
+        if (x < bird.getHeadX() + bird.getHeadWidth() && x + width / 2.0f > bird.getHeadX() &&
+            y < bird.getHeadY() + bird.getHeadHeight() && y + height > bird.getHeadY()) {
             return true;
         }
-        if (bird.getBodyY() + bird.getBodyHeight() >= y && bird.getBodyY() + bird.getBodyHeight() <= y + height) {
+        if (x < bird.getBodyX() + bird.getBodyWidth() && x + width / 2.0f > bird.getBodyX() &&
+            y < bird.getBodyY() + bird.getBodyHeight() && y + height > bird.getBodyY()) {
             return true;
         }
         return false;
     }
+    public float getX() { return x; }
+    public float getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public int getFireIndex() {return fireIndex; }
 
     public void dispose() {
         texture.dispose();
