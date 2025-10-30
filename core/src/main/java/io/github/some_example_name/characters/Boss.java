@@ -45,7 +45,7 @@ public class Boss {
         this.lowerLaser = new Laser(laserStartX, laserStartY, initLowerAngle, targetLowerAngle, LASER_CHANGE_SPEED, laserEndX, false);
         this.lasersInited = true;
         this.lasersRenderActive = true;
-        this.lasersCollisionActive = false;
+        this.lasersCollisionActive = true;
     }
     public void enableLaserCollision() {
         if (lasersInited) {
