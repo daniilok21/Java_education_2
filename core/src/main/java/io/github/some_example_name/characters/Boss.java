@@ -11,12 +11,14 @@ public class Boss {
     private int width, height;
     private Laser upperLaser;
     private Laser lowerLaser;
+    private Fireball fireball;
     private float laserEndX;
     private static float LASER_CHANGE_SPEED = 0.1f;
     private boolean lasersInited = false;
     private boolean lasersRenderActive = false;
     private boolean lasersCollisionActive = false;
     private boolean lasersVisible = true;
+    private boolean fireballInited;
     public Boss(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -26,6 +28,23 @@ public class Boss {
         this.lasersInited = false;
         this.lasersRenderActive = false;
         this.lasersCollisionActive = false;
+        this.fireballInited = false;
+    }
+    public void renderFireball(Batch batch) {
+        if (fireballInited) {
+            fireball.move();
+            fireball.draw(batch);
+        }
+    }
+    public boolean checkFireballCollision(Bird bird) {
+        if (fireballInited) {
+            return fireball.isHit(bird);
+        }
+        return false;
+    }
+    public void initFireball(int id) {
+        this.fireball = new Fireball(id);
+        fireballInited = true;
     }
     public void resetLasers() {
         upperLaser = null;
