@@ -126,11 +126,13 @@ public class ScreenGame implements Screen {
         boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
         boss.resetLasers();
         boss.resetFireballs();
+        boss.resetLava();
         stopTimer();
         initTubes();
         backgroundMusic.play();
         background.changeBG("backgrounds/game_bg.png");
         fpsTimer = 0f;
+        bird.changeGravity(-800f);
     }
 
     @Override
@@ -208,14 +210,19 @@ public class ScreenGame implements Screen {
                     System.out.println("Fireball hit!");
                     isGameOver = true;
                 }
+               if (boss.checkLavaCollision(bird)) {
+                   System.out.println("Lava hit!");
+                   isGameOver = true;
+               }
                 if (bossTransition) {
                     bossFightMusic.play();
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
-                    boss.initFireball(0, SCR_WIDTH, 20);
-                    boss.initFireball(1, SCR_WIDTH + 50, 20);
-                    boss.initFireball(2, SCR_WIDTH + 100, 20);
-                    startTimer(5000, 2);
+                    // boss.initLava(bird, SCR_HEIGHT / 3, 1, -3000f);
+                    // boss.initFireball(0, SCR_WIDTH, 20);
+                    // boss.initFireball(1, SCR_WIDTH + 50, 20);
+                    // boss.initFireball(2, SCR_WIDTH + 100, 20);
+                    // startTimer(5000, 2);
                     // boss.initFireball(3);
                     // boss.initFireball(4);
                     // boss.initLasers(-30, -10, 30, 10, 0.1f);
@@ -250,6 +257,7 @@ public class ScreenGame implements Screen {
         if (bossFight) {
             boss.draw(myGdxGame.batch);
             boss.renderFireball(myGdxGame.batch);
+            boss.renderLava(myGdxGame.batch);
         }
 
         float fontHeight = fpsFont.getData().capHeight - 10;

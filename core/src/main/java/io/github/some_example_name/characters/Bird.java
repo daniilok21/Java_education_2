@@ -10,7 +10,7 @@ public class Bird {
     int x, y;
     int width, height;
     float speedY;
-    private static final float gravity = -800f;
+    private float gravity = -800f;
     int frameCounter;
     Texture[] framesArray;
     private float headX, headY, headWidth, headHeight;
@@ -85,6 +85,9 @@ public class Bird {
     public boolean isInField() {
         return y + height > 0 && y < SCR_HEIGHT;
     }
+    public void changeGravity(float gravity) {
+        this.gravity = gravity;
+    }
 
     public int getX() {
         return x;
@@ -100,7 +103,6 @@ public class Bird {
     public int getHeight() {
         return height;
     }
-
     public float getHeadX() { return headX; }
     public float getHeadY() { return headY; }
     public float getHeadWidth() { return headWidth; }

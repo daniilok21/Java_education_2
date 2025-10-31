@@ -6,8 +6,6 @@ import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
-import java.util.Random;
-
 public class Fireball {
 
     Texture texture;
