@@ -12,18 +12,19 @@ public class Fireball {
 
     Texture texture;
     private float x, y;
-    private int speed = 10;
+    private int speed;
     private int width;
     private int height;
     private int fireIndex;
 
-    public Fireball(int fireIndex) {
+    public Fireball(int fireIndex, float x, int speed) {
         this.texture = new Texture("fireball/fireball.png");
-        this.x = SCR_WIDTH;
+        this.x = x;
         this.y = SCR_HEIGHT / 5f * fireIndex;
         this.width = SCR_HEIGHT / 5 * 2;
         this.height = width / 2;
         this.fireIndex = fireIndex;
+        this.speed = speed;
     }
 
     public void draw(Batch batch) {

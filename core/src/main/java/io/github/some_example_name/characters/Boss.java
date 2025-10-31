@@ -50,8 +50,9 @@ public class Boss {
         }
         return false;
     }
-    public void initFireball(int id) {
-        Fireball fireball = new Fireball(id);
+    public void initFireball(int id, float x, int speed) {
+        // default x = SCR_WIDTH
+        Fireball fireball = new Fireball(id, x, speed);
         fireballArray.add(fireball);
     }
     public void resetFireballs() {

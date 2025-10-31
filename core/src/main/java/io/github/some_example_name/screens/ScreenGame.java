@@ -118,6 +118,7 @@ public class ScreenGame implements Screen {
         bossTransition = false;
         bossFight = false;
         task1Compleated = false;
+        firstTask = true;
         bird.setY(SCR_HEIGHT / 2);
         bird.setSpeedY();
         flower.setPos(0, SCR_HEIGHT + 128);
@@ -125,6 +126,7 @@ public class ScreenGame implements Screen {
         boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
         boss.resetLasers();
         boss.resetFireballs();
+        stopTimer();
         initTubes();
         backgroundMusic.play();
         background.changeBG("backgrounds/game_bg.png");
@@ -165,6 +167,7 @@ public class ScreenGame implements Screen {
                 deathSound.play();
                 backgroundMusic.stop();
                 bossFightMusic.stop();
+                stopTimer();
                 myGdxGame.screenRestart.gamePoints = gamePoints;
                 myGdxGame.setScreen(myGdxGame.screenRestart);
             }
@@ -209,9 +212,9 @@ public class ScreenGame implements Screen {
                     bossFightMusic.play();
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
-                    boss.initFireball(0);
-                    boss.initFireball(1);
-                    boss.initFireball(2);
+                    boss.initFireball(0, SCR_WIDTH, 20);
+                    boss.initFireball(1, SCR_WIDTH + 50, 20);
+                    boss.initFireball(2, SCR_WIDTH + 100, 20);
                     startTimer(5000, 2);
                     // boss.initFireball(3);
                     // boss.initFireball(4);
@@ -289,11 +292,12 @@ public class ScreenGame implements Screen {
 
     @Override
     public void hide() {
-
+        stopTimer();
     }
 
     @Override
     public void dispose() {
+        stopTimer();
         bird.dispose();
         background.dispose();
         pointCounter.dispose();
@@ -304,6 +308,8 @@ public class ScreenGame implements Screen {
         boss.dispose();
         deathSound.dispose();
         backgroundMusic.dispose();
+        transitionSound.dispose();
+        bossFightMusic.dispose();
         shapeRenderer.dispose();
         fpsFont.dispose();
     }
