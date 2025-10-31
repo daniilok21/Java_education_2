@@ -97,7 +97,9 @@ public class ScreenGame implements Screen {
                     }
                     else if (idOfTask == 2) {
                         boss.initLasers(-30f, -10f, 30f, 10f, 0.1f);
-                        System.out.println("HELLO");
+                    }
+                    else if (idOfTask == 3) {
+                        System.out.println("33");
                     }
                     firstTask = true;
                     stopTimer();
@@ -127,11 +129,13 @@ public class ScreenGame implements Screen {
         boss.resetLasers();
         boss.resetFireballs();
         boss.resetLava();
+        boss.resetFlipGravitation();
         stopTimer();
         initTubes();
         backgroundMusic.play();
         background.changeBG("backgrounds/game_bg.png");
         fpsTimer = 0f;
+        bird.changeIsFliped(false);
         bird.changeGravity(-800f);
     }
 
@@ -218,15 +222,15 @@ public class ScreenGame implements Screen {
                     bossFightMusic.play();
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
+                    // boss.initFlipGravitation(SCR_WIDTH, 10);
                     // boss.initLava(bird, SCR_HEIGHT / 3, 1, -3000f);
                     // boss.initFireball(0, SCR_WIDTH, 20);
                     // boss.initFireball(1, SCR_WIDTH + 50, 20);
-                    // boss.initFireball(2, SCR_WIDTH + 100, 20);
+                    // boss.initFireball(2, SCR_WIDTH + 100, 10);
                     // startTimer(5000, 2);
-                    // boss.initFireball(3);
-                    // boss.initFireball(4);
                     // boss.initLasers(-30, -10, 30, 10, 0.1f);
                     System.out.println("Подготовка к боссфайту завершена!");
+                    startTimer(10000, 3);
                 }
             }
             else if (bossTransition) {
@@ -258,6 +262,7 @@ public class ScreenGame implements Screen {
             boss.draw(myGdxGame.batch);
             boss.renderFireball(myGdxGame.batch);
             boss.renderLava(myGdxGame.batch);
+            boss.renderFlipGravitation(myGdxGame.batch, bird);
         }
 
         float fontHeight = fpsFont.getData().capHeight - 10;

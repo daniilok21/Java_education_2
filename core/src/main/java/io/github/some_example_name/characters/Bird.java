@@ -17,6 +17,7 @@ public class Bird {
     private float bodyX, bodyY, bodyWidth, bodyHeight;
     private float headOffsetXRel, headOffsetYRel;
     private float bodyOffsetXRel, bodyOffsetYRel;
+    private boolean isFliped = false;
 
     private static final float jump = 400f;
     public Bird(int x, int y, int width, int height) {
@@ -46,7 +47,14 @@ public class Bird {
         this.bodyX = this.x + this.bodyOffsetXRel * this.width;
         this.bodyY = this.y + this.bodyOffsetYRel * this.height;
     }
-
+    public void changeIsFliped(boolean isFliped) {
+        this.isFliped = isFliped;
+    }
+    public void flipGravity() {
+        isFliped = !isFliped;
+        gravity = -gravity;
+        setSpeedY();
+    }
     public void setY(int y) {
         this.y = y;
         updateHitboxes();
@@ -57,7 +65,12 @@ public class Bird {
     }
 
     public void onClick() {
-        speedY = jump;
+        if (!isFliped) {
+            speedY = jump;
+        }
+        else {
+            speedY = -jump;
+        }
     }
 
     public void fly(float deltaTime) {
@@ -67,26 +80,31 @@ public class Bird {
         // y = y0 + v * t + 0.5 * a * t^2
         y += speedY * deltaTime + (gravity * (deltaTime * deltaTime) / 2);
 
-        if (y + height < 0) {
-            y = -height;
-        }
-        if (y > SCR_HEIGHT) {
-            y = SCR_HEIGHT;
-            speedY = 0f;
-        }
         updateHitboxes();
     }
     private void updateHitboxes() {
-        this.headX = this.x + this.headOffsetXRel * this.width;
-        this.headY = this.y + this.headOffsetYRel * this.height;
-        this.bodyX = this.x + this.bodyOffsetXRel * this.width;
-        this.bodyY = this.y + this.bodyOffsetYRel * this.height;
+        if (!isFliped) {
+            this.headX = this.x + this.headOffsetXRel * this.width;
+            this.headY = this.y + this.headOffsetYRel * this.height;
+            this.bodyX = this.x + this.bodyOffsetXRel * this.width;
+            this.bodyY = this.y + this.bodyOffsetYRel * this.height;
+        } else {
+            this.headX = this.x + this.headOffsetXRel * this.width;
+            this.headY = this.y + height - this.headOffsetYRel * this.height - headHeight;
+            this.bodyX = this.x + this.bodyOffsetXRel * this.width;
+            this.bodyY = this.y + height - this.bodyOffsetYRel * this.height - bodyHeight;
+        }
     }
     public boolean isInField() {
         return y + height > 0 && y < SCR_HEIGHT;
     }
     public void changeGravity(float gravity) {
-        this.gravity = gravity;
+        if (!isFliped) {
+            this.gravity = gravity;
+        }
+        else {
+            this.gravity = -gravity;
+        }
     }
 
     public int getX() {
@@ -111,10 +129,16 @@ public class Bird {
     public float getBodyY() { return bodyY; }
     public float getBodyWidth() { return bodyWidth; }
     public float getBodyHeight() { return bodyHeight; }
+    public boolean getIsFlipped() { return isFliped; }
 
     public void draw(Batch batch) {
         int frameMultiplier = 10;
-        batch.draw(framesArray[frameCounter / frameMultiplier], x, y, width, height);
+        Texture currentFrame = framesArray[frameCounter / frameMultiplier];
+        if (!isFliped) {
+            batch.draw(currentFrame, x, y, width, height);
+        } else {
+            batch.draw(currentFrame, x, y + height, width, -height);
+        }
         if (frameCounter++ == framesArray.length * frameMultiplier - 1) frameCounter = 0;
     }
 

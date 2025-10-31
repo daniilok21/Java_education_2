@@ -16,6 +16,7 @@ public class Lava {
     int width;
     int height;
     boolean isUpperLava;
+    boolean goBack = false;
 
     public Lava(int distanceBetweenLaves, int speed, boolean isUpperLava) {
         this.distanceBetweenLaves = distanceBetweenLaves;
@@ -26,6 +27,7 @@ public class Lava {
         this.speed = speed;
         this.width = SCR_WIDTH;
         this.isUpperLava = isUpperLava;
+        this.goBack = false;
 
         textureUpperLava = new Texture("lava/lava.png");
         textureDownLava = new Texture("lava/lava.png");
@@ -37,18 +39,38 @@ public class Lava {
     }
 
     public void move() {
-        if (SCR_HEIGHT > (yLower + height) + (SCR_HEIGHT - yUpper) + distanceBetweenLaves) {
+        if (!goBack && SCR_HEIGHT > (yLower + height) + (SCR_HEIGHT - yUpper) + distanceBetweenLaves) {
             yUpper -= speed;
             yLower += speed;
         }
+        else {
+            yUpper += speed;
+            yLower -= speed;
+            if (x + width <= 0) {
+                dispose();
+            }
+        }
 
     }
+    public void setGoBack() {
+        this.goBack = true;
+    }
     public boolean isHit(Bird bird) {
-        if (bird.getHeadY() + bird.getHeadHeight() >= yUpper) {
-            return true;
+        if (!bird.getIsFlipped()) {
+            if (bird.getHeadY() + bird.getHeadHeight() >= yUpper) {
+                return true;
+            }
+            if (bird.getBodyY() <= yLower + height) {
+                return true;
+            }
         }
-        if (bird.getBodyY() <= yLower + height) {
-            return true;
+        else {
+            if (bird.getBodyY() + bird.getBodyHeight() >= yUpper) {
+                return true;
+            }
+            if (bird.getHeadY() <= yLower + height) {
+                return true;
+            }
         }
         return false;
     }

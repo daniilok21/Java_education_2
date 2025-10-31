@@ -13,6 +13,7 @@ public class Boss {
     private Laser upperLaser;
     private Laser lowerLaser;
     private Lava lava;
+    private FlipGravitation flipGravitation;
     private float laserEndX;
     private static float LASER_CHANGE_SPEED = 0.1f;
     private boolean lasersInited = false;
@@ -31,18 +32,36 @@ public class Boss {
         this.lasersCollisionActive = false;
         this.fireballArray = new Array<Fireball>();
     }
+    public void initFlipGravitation(float x, int speed) {
+        resetFlipGravitation();
+        flipGravitation = new FlipGravitation(x, speed);
+    }
+    public void renderFlipGravitation(Batch batch, Bird bird) {
+        if (flipGravitation != null) {
+            flipGravitation.move();
+            flipGravitation.draw(batch);
+            flipGravitation.needFleepGravity(bird);
+        }
+    }
+    public void resetFlipGravitation() {
+        flipGravitation = null;
+    }
     public void initLava(Bird bird, int distanceBetweenLaves, int speed, float gravity) {
         resetLava();
         lava = new Lava(distanceBetweenLaves, speed, true);
         bird.changeGravity(gravity);
-
     }
     public void resetLava() {
         lava = null;
     }
+    public void backGoLava() {
+        lava.setGoBack();
+    }
     public void renderLava(Batch batch) {
-        lava.move();
-        lava.draw(batch);
+        if (lava != null) {
+            lava.move();
+            lava.draw(batch);
+        }
     }
     public void renderFireball(Batch batch) {
         for (int i = fireballArray.size - 1; i >= 0; i--) {
