@@ -10,7 +10,7 @@ public class Flower {
     private Texture texture = new Texture("flower.png");
     private float x, y;
     private int width, height;
-    private static final int TARGET_TUBE_INDEX = 4;
+    private static final int TARGET_TUBE_INDEX = 0;
 
     private int speed = 20;
     private boolean isActive = false;

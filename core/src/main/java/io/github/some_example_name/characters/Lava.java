@@ -38,21 +38,25 @@ public class Lava {
         batch.draw(textureDownLava, x, yLower, width, height);
     }
 
-    public void move() {
+    public void move(Bird bird) {
         if (!goBack && SCR_HEIGHT > (yLower + height) + (SCR_HEIGHT - yUpper) + distanceBetweenLaves) {
             yUpper -= speed;
             yLower += speed;
         }
+        else if (!goBack && SCR_HEIGHT == (yLower + height) + (SCR_HEIGHT - yUpper) + distanceBetweenLaves) {
+        }
         else {
             yUpper += speed;
             yLower -= speed;
-            if (x + width <= 0) {
+            if (yLower + height <= 0) {
+                bird.changeGravity(-800);
                 dispose();
             }
         }
 
     }
-    public void setGoBack() {
+    public void setGoBack(int speed) {
+        this.speed = speed;
         this.goBack = true;
     }
     public boolean isHit(Bird bird) {

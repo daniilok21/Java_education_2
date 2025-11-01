@@ -13,7 +13,6 @@ public class Boss {
     private Laser upperLaser;
     private Laser lowerLaser;
     private Lava lava;
-    private FlipGravitation flipGravitation;
     private float laserEndX;
     private static float LASER_CHANGE_SPEED = 0.1f;
     private boolean lasersInited = false;
@@ -21,6 +20,7 @@ public class Boss {
     private boolean lasersCollisionActive = false;
     private boolean lasersVisible = true;
     private Array<Fireball> fireballArray;
+    private Array<FlipGravitation> flipGravitationArray;
     public Boss(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -31,20 +31,30 @@ public class Boss {
         this.lasersRenderActive = false;
         this.lasersCollisionActive = false;
         this.fireballArray = new Array<Fireball>();
+        this.flipGravitationArray = new Array<FlipGravitation>();
     }
     public void initFlipGravitation(float x, int speed) {
-        resetFlipGravitation();
-        flipGravitation = new FlipGravitation(x, speed);
+        FlipGravitation flipGravitation = new FlipGravitation(x, speed);
+        flipGravitationArray.add(flipGravitation);
     }
     public void renderFlipGravitation(Batch batch, Bird bird) {
-        if (flipGravitation != null) {
+        for (int i = flipGravitationArray.size - 1; i >= 0; i--) {
+            FlipGravitation flipGravitation = flipGravitationArray.get(i);
             flipGravitation.move();
-            flipGravitation.draw(batch);
-            flipGravitation.needFleepGravity(bird);
+            if (flipGravitation.getX() + flipGravitation.getWidth() < 0) {
+                flipGravitation.dispose();
+                flipGravitationArray.removeIndex(i);
+            } else {
+                flipGravitation.draw(batch);
+                flipGravitation.needFleepGravity(bird);
+            }
         }
     }
     public void resetFlipGravitation() {
-        flipGravitation = null;
+        for (FlipGravitation flipGravitation : flipGravitationArray) {
+            flipGravitation.dispose();
+        }
+        flipGravitationArray.clear();
     }
     public void initLava(Bird bird, int distanceBetweenLaves, int speed, float gravity) {
         resetLava();
@@ -54,12 +64,12 @@ public class Boss {
     public void resetLava() {
         lava = null;
     }
-    public void backGoLava() {
-        lava.setGoBack();
+    public void backGoLava(int speed) {
+        lava.setGoBack(speed);
     }
-    public void renderLava(Batch batch) {
+    public void renderLava(Batch batch, Bird bird) {
         if (lava != null) {
-            lava.move();
+            lava.move(bird);
             lava.draw(batch);
         }
     }

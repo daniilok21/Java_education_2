@@ -76,7 +76,6 @@ public class Bird {
     public void fly(float deltaTime) {
         // v = v0 + a * t
         speedY += gravity * deltaTime;
-
         // y = y0 + v * t + 0.5 * a * t^2
         y += speedY * deltaTime + (gravity * (deltaTime * deltaTime) / 2);
 
@@ -96,7 +95,7 @@ public class Bird {
         }
     }
     public boolean isInField() {
-        return y + height > 0 && y < SCR_HEIGHT;
+        return y + getBodyHeight() > 0 && y + getBodyHeight() < SCR_HEIGHT;
     }
     public void changeGravity(float gravity) {
         if (!isFliped) {

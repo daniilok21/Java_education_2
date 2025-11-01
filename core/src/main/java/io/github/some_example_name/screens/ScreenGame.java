@@ -15,11 +15,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map;
+import java.util.HashMap;
 
 import io.github.some_example_name.MyGdxGame;
 import io.github.some_example_name.characters.Bird;
 import io.github.some_example_name.characters.Boss;
-import io.github.some_example_name.characters.Fireball;
 import io.github.some_example_name.characters.Flower;
 import io.github.some_example_name.characters.Tube;
 import io.github.some_example_name.components.MovingBackground;
@@ -43,6 +44,7 @@ public class ScreenGame implements Screen {
 
     int gamePoints;
     boolean isGameOver;
+    boolean isWin;
     boolean bossTransition;
     boolean bossFight;
 
@@ -50,6 +52,7 @@ public class ScreenGame implements Screen {
     private Timer timer;
     boolean firstTask = true;
     boolean task1Compleated = false;
+    private Map<Integer, Timer> timers;
     private static final float frameTime = 1/60f;
     Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/death.mp3"));
     Sound transitionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/transition.mp3"));
@@ -59,6 +62,7 @@ public class ScreenGame implements Screen {
     final float fpsLogInterval = 1f;
     private BitmapFont fpsFont;
     int currentFPS = 0;
+    boolean godMode = false;
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -78,45 +82,45 @@ public class ScreenGame implements Screen {
         this.fpsFont = new BitmapFont();
         this.fpsFont.setColor(Color.WHITE);
         this.fpsFont.getData().setScale(1.0f);
+        this.timers = new HashMap<>();
     }
-    public void startTimer(int timee, int idOfTask) {
-        // 1 - смена бг для боссфайта + боссфайт + фаеры
-        // 2 - лазеры
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
+    public void startTimer(float time, int idOfTask, Runnable action) {
+        int timee = (int) (time * 1000);
+        Timer newTimer = new Timer();
+        timers.put(idOfTask, newTimer);
+        newTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (firstTask) {
-                    firstTask = false;
+                System.out.println("Timer ID = " + idOfTask + " triggered");
+                if (action != null) {
+                    Gdx.app.postRunnable(action);
                 }
-                else {
-                    System.out.println("ID = " + idOfTask);
-                    if (idOfTask == 1) {
-                        task1Compleated = true;
-                        bossFight = true;
-                    }
-                    else if (idOfTask == 2) {
-                        boss.initLasers(-30f, -10f, 30f, 10f, 0.1f);
-                    }
-                    else if (idOfTask == 3) {
-                        System.out.println("33");
-                    }
-                    firstTask = true;
-                    stopTimer();
-                }
+                stopIdTimer(idOfTask);
             }
-        }, 0, timee); // Интервал в timee миллисекунд (timee / 1000 секунд)
+        }, timee);
     }
-    public void stopTimer() {
-        if (timer != null) {
-            timer.cancel();
+    public void stopIdTimer(int idOfTask) {
+        Timer timerToStop = timers.get(idOfTask);
+        if (timerToStop != null) {
+            timerToStop.cancel();
+            timers.remove(idOfTask);
+            System.out.println(idOfTask + " удален.");
         }
     }
-
+    public void stopTimer() {
+        for (Integer id : new java.util.ArrayList<>(timers.keySet())) {
+            stopIdTimer(id);
+        }
+        System.out.println("СТОПЭ всем таймерам");
+    }
+    public void godModeChange(boolean godMode) {
+        this.godMode = godMode;
+    }
     @Override
     public void show() {
         gamePoints = 0;
         isGameOver = false;
+        isWin = false;
         bossTransition = false;
         bossFight = false;
         task1Compleated = false;
@@ -160,7 +164,10 @@ public class ScreenGame implements Screen {
                 }
                 background.changeBG("backgrounds/transition_bg.png");
                 backgroundMusic.stop();
-                startTimer(2700, 1);
+                startTimer(2.7f, 100, () -> {
+                    bossFight = true;
+                    task1Compleated = true;
+                });
                 transitionSound.play();
             }
             else {
@@ -169,12 +176,19 @@ public class ScreenGame implements Screen {
         }
         while (timeTime >= frameTime) {
             timeTime -= frameTime;
-            if (isGameOver) {
+            if (isGameOver && !godMode) {
                 deathSound.play();
                 backgroundMusic.stop();
                 bossFightMusic.stop();
                 stopTimer();
+                myGdxGame.screenRestart.isWin = false;
                 myGdxGame.screenRestart.gamePoints = gamePoints;
+                myGdxGame.setScreen(myGdxGame.screenRestart);
+            }
+            else if (isWin) {
+                myGdxGame.screenRestart.isWin = true;
+                myGdxGame.screenRestart.gameText = "YOU WON!";
+                stopTimer();
                 myGdxGame.setScreen(myGdxGame.screenRestart);
             }
 
@@ -210,27 +224,83 @@ public class ScreenGame implements Screen {
                     System.out.println("Laser hit!");
                     isGameOver = true;
                 }
-                if (boss.checkFireballCollision(bird)) {
+                else if (boss.checkFireballCollision(bird)) {
                     System.out.println("Fireball hit!");
                     isGameOver = true;
                 }
-               if (boss.checkLavaCollision(bird)) {
+                else if (boss.checkLavaCollision(bird)) {
                    System.out.println("Lava hit!");
                    isGameOver = true;
-               }
+                }
                 if (bossTransition) {
                     bossFightMusic.play();
                     background.changeBG("backgrounds/boss_bg.png");
                     bossTransition = false;
-                    // boss.initFlipGravitation(SCR_WIDTH, 10);
-                    // boss.initLava(bird, SCR_HEIGHT / 3, 1, -3000f);
-                    // boss.initFireball(0, SCR_WIDTH, 20);
-                    // boss.initFireball(1, SCR_WIDTH + 50, 20);
-                    // boss.initFireball(2, SCR_WIDTH + 100, 10);
-                    // startTimer(5000, 2);
-                    // boss.initLasers(-30, -10, 30, 10, 0.1f);
+                    boss.initLasers(-30, -10, 30, 10, 0.3f);
+                    startTimer(4f, 100, () -> {
+                        boss.disableLasers();
+                    });
+                    startTimer(4f, 101, () -> {
+                        boss.initFireball(0, SCR_WIDTH, 15);
+                        boss.initFireball(1, SCR_WIDTH, 15);
+                        boss.initFireball(2, SCR_WIDTH, 15);
+                    });
+                    startTimer(4.5f, 102, () -> {
+                        boss.initFireball(0, SCR_WIDTH, 10);
+                        boss.initFireball(3, SCR_WIDTH, 10);
+                        boss.initFireball(4, SCR_WIDTH, 10);
+                    });
+                    startTimer(7f, 103, () -> {
+                        boss.initLasers(-30, -11, 30, 11, 0.3f);
+                    });
+                    startTimer(8f, 105, () -> {
+                        boss.initFlipGravitation(SCR_WIDTH, 10);
+                    });
+                    startTimer(10f, 106, () -> {
+                        boss.initFlipGravitation(SCR_WIDTH, 10);
+                    });
+                    startTimer(11.5f, 104, () -> {
+                        boss.disableLasers();
+                        boss.initLava(bird, SCR_HEIGHT / 3, 2, -3500);
+                    });
+                    startTimer(16f, 107, () -> {
+                        boss.backGoLava(4);
+                    });
+                    startTimer(16.5f, 108, () -> {
+                        boss.initLasers(-30, -19, 30, 0, 0.3f);
+                    });
+                    startTimer(20f, 109, () -> {
+                        boss.disableLasers();
+                        boss.initFireball(2, SCR_WIDTH, 10);
+                        boss.initFireball(3, SCR_WIDTH, 10);
+                        boss.initFireball(4, SCR_WIDTH, 10);
+                    });
+                    startTimer(21f, 110, () -> {
+                        boss.initFireball(0, SCR_WIDTH, 9);
+                        boss.initFireball(1, SCR_WIDTH + SCR_HEIGHT / 5, 9);
+                        boss.initFireball(2, SCR_WIDTH + SCR_HEIGHT / 5 * 2, 9);
+                        boss.initFlipGravitation(SCR_WIDTH + SCR_HEIGHT / 5 * 4 + 64, 9);
+                    });
+                    startTimer(22.5f, 111, () -> {
+                        boss.initFireball(4, SCR_WIDTH, 9);
+                        boss.initFireball(3, SCR_WIDTH + SCR_HEIGHT / 5 * 2, 9);
+                        boss.initFireball(2, SCR_WIDTH + SCR_HEIGHT / 5 * 3, 9);
+                    });
+                    startTimer(24.5f, 114, () -> {
+                        boss.initFlipGravitation(SCR_WIDTH, 9);
+                    });
+                    startTimer(26f, 112, () -> {
+                        boss.initLasers(-30, -9, 30, 9, 0.5f);
+                    });
+                    startTimer(28f, 113, () -> {
+                        boss.disableLasers();
+                        boss.initLava(bird, SCR_HEIGHT / 3, 2, -3500);
+                    });
+                    startTimer(32f, 115, () -> {
+                        isWin = true;
+                        System.out.println("ВСЕ");
+                    });
                     System.out.println("Подготовка к боссфайту завершена!");
-                    startTimer(10000, 3);
                 }
             }
             else if (bossTransition) {
@@ -261,7 +331,7 @@ public class ScreenGame implements Screen {
         if (bossFight) {
             boss.draw(myGdxGame.batch);
             boss.renderFireball(myGdxGame.batch);
-            boss.renderLava(myGdxGame.batch);
+            boss.renderLava(myGdxGame.batch, bird);
             boss.renderFlipGravitation(myGdxGame.batch, bird);
         }
 
@@ -277,6 +347,7 @@ public class ScreenGame implements Screen {
             shapeRenderer.end();
         }
         showHitboxes();
+        // godModeChange(true);
     }
 
     private void showHitboxes() {
