@@ -342,7 +342,7 @@ public class ScreenGame implements Screen {
         myGdxGame.batch.end();
         if (bossFight) {
             shapeRenderer.setProjectionMatrix(myGdxGame.camera.combined);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             boss.renderLasers(shapeRenderer);
 
             shapeRenderer.end();

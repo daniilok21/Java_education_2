@@ -13,6 +13,10 @@ public class Laser {
     private float bossY;
     private float startX;
     private float endX;
+    private float inLineWidth = 4.0f;
+    private float outLineWidth = 8.0f;
+    private Color inColor = Color.YELLOW;
+    private Color outColor = Color.RED;
 
     private final boolean isUpperLaser;
 
@@ -72,8 +76,11 @@ public class Laser {
         float startY = k * startX + b;
         float endY = k * endX + b;
 
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.line(startX, startY, endX, endY);
+        shapeRenderer.setColor(outColor);
+        shapeRenderer.rectLine(startX, startY, endX, endY, outLineWidth);
+
+        shapeRenderer.setColor(inColor);
+        shapeRenderer.rectLine(startX, startY, endX, endY, inLineWidth);
     }
     public void reset() {
         this.k = this.initK;
