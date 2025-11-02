@@ -6,6 +6,7 @@ import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -63,6 +64,11 @@ public class ScreenGame implements Screen {
     private BitmapFont fpsFont;
     int currentFPS = 0;
     boolean godMode = false;
+    private float flashIntensity;
+    private float flashDuration;
+    private float flashTimer;
+    private boolean isFlashing = false;
+    private Texture whitePixel;
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -83,6 +89,14 @@ public class ScreenGame implements Screen {
         this.fpsFont.setColor(Color.WHITE);
         this.fpsFont.getData().setScale(1.0f);
         this.timers = new HashMap<>();
+        com.badlogic.gdx.graphics.Pixmap pixmap = new com.badlogic.gdx.graphics.Pixmap(1, 1, com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        this.whitePixel = new Texture(pixmap);
+        pixmap.dispose();
+        this.flashDuration = 0f;
+        this.flashTimer = 0f;
+        this.isFlashing = false;
     }
     public void startTimer(float time, int idOfTask, Runnable action) {
         int timee = (int) (time * 1000);
@@ -113,6 +127,12 @@ public class ScreenGame implements Screen {
         }
         System.out.println("СТОПЭ всем таймерам");
     }
+    public void startFlash(float duration) {
+        this.flashDuration = duration;
+        this.flashTimer = 0f;
+        this.isFlashing = true;
+        this.flashIntensity = 0f;
+    }
     public void godModeChange(boolean godMode) {
         this.godMode = godMode;
     }
@@ -141,6 +161,9 @@ public class ScreenGame implements Screen {
         fpsTimer = 0f;
         bird.changeIsFliped(false);
         bird.changeGravity(-800f);
+        this.flashDuration = 0f;
+        this.flashTimer = 0f;
+        this.isFlashing = false;
     }
 
     @Override
@@ -157,18 +180,23 @@ public class ScreenGame implements Screen {
             );
             if (flower.isHit((int) touch.x, (int) touch.y) && !bossTransition) {
                 bossTransition = true;
-                // ДОПИСАТЬ
                 System.out.println("ЦВЯТОЧЕК");
                 for (int i = 0; i < tubeCount; i++) {
                     tubes[i].dispose();
                 }
-                background.changeBG("backgrounds/transition_bg.png");
+                startTimer(0.5f, 2, () -> {
+                    background.changeBG("backgrounds/transition_bg.png");
+                });
                 backgroundMusic.stop();
-                startTimer(2.7f, 100, () -> {
+                startTimer(2.7f, 1, () -> {
                     bossFight = true;
                     task1Compleated = true;
                 });
+                startTimer(2.2f, 3, () -> {
+                    startFlash(1f);
+                });
                 transitionSound.play();
+                startFlash(1f);
             }
             else {
                 bird.onClick();
@@ -194,6 +222,25 @@ public class ScreenGame implements Screen {
 
             background.move();
             bird.fly(frameTime);
+
+            if (isFlashing) {
+                flashTimer += frameTime;
+                if (flashTimer >= flashDuration) {
+                    isFlashing = false;
+                    flashIntensity = 0.0f;
+                    flashTimer = 0.0f;
+                }
+                else {
+                    if (flashTimer / flashDuration <= 0.5f) {
+                        flashIntensity = flashTimer / flashDuration / 0.5f; // 0.0 -> 1.0
+                    }
+                    else {
+                        flashIntensity = 1.0f - ((flashTimer / flashDuration - 0.5f) / 0.5f); // 1.0 -> 0.0
+                    }
+                    flashIntensity = Math.max(0.0f, Math.min(1.0f, flashIntensity));
+                }
+            }
+
             if (!bird.isInField()) {
                 System.out.println("not in field");
                 isGameOver = true;
@@ -296,17 +343,14 @@ public class ScreenGame implements Screen {
                         boss.disableLasers();
                         boss.initLava(bird, SCR_HEIGHT / 3, 2, -3500);
                     });
+                    startTimer(30f, 116, () -> {
+                        startFlash(4f);
+                    });
                     startTimer(32f, 115, () -> {
                         isWin = true;
                         System.out.println("ВСЕ");
                     });
                     System.out.println("Подготовка к боссфайту завершена!");
-                }
-            }
-            else if (bossTransition) {
-                if (task1Compleated) {
-                    background.changeBG("backgrounds/game_bg.png");
-                    task1Compleated = false;
                 }
             }
         }
@@ -339,6 +383,12 @@ public class ScreenGame implements Screen {
         float fontHeight = fpsFont.getData().capHeight - 10;
         fpsFont.draw(myGdxGame.batch, "FPS: " + currentFPS, 0, SCR_HEIGHT - fontHeight);
 
+        if (isFlashing && flashIntensity > 0.0f) {
+            myGdxGame.batch.setColor(1, 1, 1, flashIntensity);
+            myGdxGame.batch.draw(whitePixel, 0, 0, SCR_WIDTH, SCR_HEIGHT);
+            myGdxGame.batch.setColor(1, 1, 1, 1);
+        }
+
         myGdxGame.batch.end();
         if (bossFight) {
             shapeRenderer.setProjectionMatrix(myGdxGame.camera.combined);
@@ -347,7 +397,7 @@ public class ScreenGame implements Screen {
 
             shapeRenderer.end();
         }
-        showHitboxes();
+        // showHitboxes();
         // godModeChange(true);
     }
 
@@ -397,6 +447,9 @@ public class ScreenGame implements Screen {
         bossFightMusic.dispose();
         shapeRenderer.dispose();
         fpsFont.dispose();
+        if (whitePixel != null) {
+            whitePixel.dispose();
+        }
     }
 
     void initTubes() {
