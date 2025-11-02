@@ -72,7 +72,7 @@ public class ScreenGame implements Screen {
         bird = new Bird(20, SCR_HEIGHT / 2, 250, 200);
         pointCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop);
         flower = new Flower(0, SCR_HEIGHT + 128, 70, 130);
-        boss = new Boss(0, 0, 128, 128);
+        boss = new Boss(0, 0, 256, 256);
         this.shapeRenderer = new ShapeRenderer();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/jumper.mp3"));
         bossFightMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/boss_fight.mp3"));
@@ -129,7 +129,7 @@ public class ScreenGame implements Screen {
         bird.setSpeedY();
         flower.setPos(0, SCR_HEIGHT + 128);
         flower.swtichActiveFalse();
-        boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth(), SCR_HEIGHT / 2f - boss.getHeight() / 2f);
+        boss.setPosition(SCR_WIDTH * 0.9f - boss.getWidth() / 2, SCR_HEIGHT / 2f - boss.getHeight() / 2f);
         boss.resetLasers();
         boss.resetFireballs();
         boss.resetLava();
@@ -234,7 +234,7 @@ public class ScreenGame implements Screen {
                 }
                 if (bossTransition) {
                     bossFightMusic.play();
-                    background.changeBG("backgrounds/boss_bg.png");
+                    background.changeBG("backgrounds/boss_fight.png");
                     bossTransition = false;
                     boss.initLasers(-30, -10, 30, 10, 0.3f);
                     startTimer(4f, 100, () -> {
@@ -321,6 +321,12 @@ public class ScreenGame implements Screen {
             flower.draw(myGdxGame.batch);
             pointCounter.draw(myGdxGame.batch, gamePoints);
         }
+        if (bossFight) {
+            boss.draw(myGdxGame.batch);
+            boss.renderFireball(myGdxGame.batch);
+            boss.renderLava(myGdxGame.batch, bird);
+            boss.renderFlipGravitation(myGdxGame.batch, bird);
+        }
         if (!bossTransition ) {
             bird.draw(myGdxGame.batch);
         }
@@ -328,12 +334,7 @@ public class ScreenGame implements Screen {
             bird.setY(SCR_HEIGHT / 2);
             bird.setSpeedY();
         }
-        if (bossFight) {
-            boss.draw(myGdxGame.batch);
-            boss.renderFireball(myGdxGame.batch);
-            boss.renderLava(myGdxGame.batch, bird);
-            boss.renderFlipGravitation(myGdxGame.batch, bird);
-        }
+
 
         float fontHeight = fpsFont.getData().capHeight - 10;
         fpsFont.draw(myGdxGame.batch, "FPS: " + currentFPS, 0, SCR_HEIGHT - fontHeight);

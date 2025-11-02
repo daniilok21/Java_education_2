@@ -6,9 +6,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 
 public class Boss {
-
+    int frameCounter;
+    Texture[] framesArray;
     private float x, y;
-    private Texture texture = new Texture("boss/boss.png");
     private int width, height;
     private Laser upperLaser;
     private Laser lowerLaser;
@@ -32,6 +32,13 @@ public class Boss {
         this.lasersCollisionActive = false;
         this.fireballArray = new Array<Fireball>();
         this.flipGravitationArray = new Array<FlipGravitation>();
+        this.frameCounter = 0;
+        framesArray = new Texture[]{
+            new Texture("boss/demon1.png"),
+            new Texture("boss/demon2.png"),
+            new Texture("boss/demon3.png"),
+            new Texture("boss/demon4.png"),
+        };
     }
     public void initFlipGravitation(float x, int speed) {
         FlipGravitation flipGravitation = new FlipGravitation(x, speed);
@@ -121,14 +128,23 @@ public class Boss {
     public void initLasers(float initUpperAngle, float targetUpperAngle, float initLowerAngle, float targetLowerAngle, float speed) {
         // default: -30f, -10f, 30f, 10f, 0.1f;
         resetLasers();
-        float laserStartX = this.x + this.width / 2.0f;
-        float laserStartY = this.y + this.height / 2.0f;
+        float laserStartX = this.x + this.width * 0.38f;
+        float laserStartY = this.y + this.height * 0.38f;
         this.LASER_CHANGE_SPEED = speed;
         this.upperLaser = new Laser(laserStartX, laserStartY, initUpperAngle, targetUpperAngle, LASER_CHANGE_SPEED, laserEndX, true);
         this.lowerLaser = new Laser(laserStartX, laserStartY, initLowerAngle, targetLowerAngle, LASER_CHANGE_SPEED, laserEndX, false);
         this.lasersInited = true;
         this.lasersRenderActive = true;
         this.lasersCollisionActive = true;
+    }
+    public void renderLasers(ShapeRenderer shapeRenderer) {
+        if (lasersRenderActive && lasersInited && lasersVisible) {
+            upperLaser.setBossPos(this.x + this.width * 0.38f, this.y + this.height * 0.38f);
+            lowerLaser.setBossPos(this.x + this.width * 0.38f, this.y + this.height * 0.38f);
+
+            upperLaser.render(shapeRenderer);
+            lowerLaser.render(shapeRenderer);
+        }
     }
     public void enableLaserCollision() {
         if (lasersInited) {
@@ -149,22 +165,16 @@ public class Boss {
         return this.lasersCollisionActive;
     }
     public void draw(Batch batch) {
-        batch.draw(texture, x, y, width, height);
+        int frameMultiplier = 10;
+        Texture currentFrame = framesArray[frameCounter / frameMultiplier];
+        batch.draw(currentFrame, x, y, width, height);
+        if (frameCounter++ == framesArray.length * frameMultiplier - 1) frameCounter = 0;
     }
     public boolean isKofLaserEqualTargetK() {
         if (lasersRenderActive && lasersInited) {
             return upperLaser.isKequalTargetK();
         }
         return false;
-    }
-    public void renderLasers(ShapeRenderer shapeRenderer) {
-        if (lasersRenderActive && lasersInited && lasersVisible) {
-            upperLaser.setBossPos(this.x + this.width / 2.0f, this.y + this.height / 2.0f);
-            lowerLaser.setBossPos(this.x + this.width / 2.0f, this.y + this.height / 2.0f);
-
-            upperLaser.render(shapeRenderer);
-            lowerLaser.render(shapeRenderer);
-        }
     }
     public void updateLasers(float deltaTime) {
         if (lasersInited) {
@@ -188,10 +198,6 @@ public class Boss {
     public boolean isLasersVisible() {
         return this.lasersVisible;
     }
-    public Texture getTexture() {
-        return texture;
-    }
-
     public int getWidth() {
         return width;
     }
@@ -214,7 +220,9 @@ public class Boss {
     }
 
     public void dispose() {
-        texture.dispose();
+        for (Texture texture : framesArray) {
+            texture.dispose();
+        }
         if (upperLaser != null) {
             upperLaser = null;
         }

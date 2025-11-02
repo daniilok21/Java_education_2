@@ -29,7 +29,7 @@ public class Lava {
         this.isUpperLava = isUpperLava;
         this.goBack = false;
 
-        textureUpperLava = new Texture("lava/lava.png");
+        textureUpperLava = new Texture("lava/lava_reverse.png");
         textureDownLava = new Texture("lava/lava.png");
     }
 

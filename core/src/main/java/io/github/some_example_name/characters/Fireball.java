@@ -8,7 +8,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 public class Fireball {
 
-    Texture texture;
+    int frameCounter;
+    Texture[] framesArray;
     private float x, y;
     private int speed;
     private int width;
@@ -16,17 +17,26 @@ public class Fireball {
     private int fireIndex;
 
     public Fireball(int fireIndex, float x, int speed) {
-        this.texture = new Texture("fireball/fireball.png");
+        framesArray = new Texture[]{
+            new Texture("fireball/fireball1.png"),
+            new Texture("fireball/fireball2.png"),
+            new Texture("fireball/fireball3.png"),
+            new Texture("fireball/fireball4.png"),
+        };
         this.x = x;
         this.y = SCR_HEIGHT / 5f * fireIndex;
         this.width = SCR_HEIGHT / 5 * 2;
         this.height = width / 2;
         this.fireIndex = fireIndex;
         this.speed = speed;
+        this.frameCounter = 0;
     }
 
     public void draw(Batch batch) {
-        batch.draw(texture, x, y, width, height);
+        int frameMultiplier = 10;
+        Texture currentFrame = framesArray[frameCounter / frameMultiplier];
+        batch.draw(currentFrame, x, y, width, height);
+        if (frameCounter++ == framesArray.length * frameMultiplier - 1) frameCounter = 0;
     }
 
     public void move() {
@@ -54,6 +64,8 @@ public class Fireball {
     public int getFireIndex() {return fireIndex; }
 
     public void dispose() {
-        texture.dispose();
+        for (Texture texture : framesArray) {
+            texture.dispose();
+        }
     }
 }

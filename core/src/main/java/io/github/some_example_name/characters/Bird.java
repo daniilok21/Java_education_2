@@ -95,7 +95,7 @@ public class Bird {
         }
     }
     public boolean isInField() {
-        return y + getBodyHeight() > 0 && y + getBodyHeight() < SCR_HEIGHT;
+        return y > 0 && y + getBodyHeight() < SCR_HEIGHT;
     }
     public void changeGravity(float gravity) {
         if (!isFliped) {
