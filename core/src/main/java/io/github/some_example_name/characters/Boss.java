@@ -209,7 +209,9 @@ public class Boss {
     public void setX(float x) {
         this.x = x;
     }
-
+    public Array<Fireball> getFireballs() {
+        return this.fireballArray;
+    }
     public void setY(float y) {
         this.y = y;
     }

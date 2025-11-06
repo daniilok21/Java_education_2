@@ -1,7 +1,7 @@
+// io/github/some_example_name/characters/Fireball.java
 package io.github.some_example_name.characters;
 
 import static io.github.some_example_name.MyGdxGame.SCR_HEIGHT;
-import static io.github.some_example_name.MyGdxGame.SCR_WIDTH;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -15,6 +15,9 @@ public class Fireball {
     private int width;
     private int height;
     private int fireIndex;
+    private float hitboxRadius;
+    private float hitboxCenterX;
+    private float hitboxCenterY;
 
     public Fireball(int fireIndex, float x, int speed) {
         framesArray = new Texture[]{
@@ -25,11 +28,14 @@ public class Fireball {
         };
         this.x = x;
         this.y = SCR_HEIGHT / 5f * fireIndex;
-        this.width = SCR_HEIGHT / 5 * 2;
+        this.width = (int) (SCR_HEIGHT / 5.0f * 2.0f);
         this.height = width / 2;
         this.fireIndex = fireIndex;
         this.speed = speed;
         this.frameCounter = 0;
+        this.hitboxRadius = this.height / 2.0f;
+        this.hitboxCenterX = this.x + this.width / 4.0f;
+        this.hitboxCenterY = this.y + this.height / 2.0f;
     }
 
     public void draw(Batch batch) {
@@ -41,28 +47,36 @@ public class Fireball {
 
     public void move() {
         x -= speed;
+        hitboxCenterX = x + width / 4.0f;
         if (x < -width) {
             dispose();
         }
     }
-
     public boolean isHit(Bird bird) {
-        if (x < bird.getHeadX() + bird.getHeadWidth() && x + width / 2.0f > bird.getHeadX() &&
-            y < bird.getHeadY() + bird.getHeadHeight() && y + height > bird.getHeadY()) {
+        if (checkCircleRectCollision(bird.getHeadX(), bird.getHeadY(), bird.getHeadWidth(), bird.getHeadHeight())) {
             return true;
         }
-        if (x < bird.getBodyX() + bird.getBodyWidth() && x + width / 2.0f > bird.getBodyX() &&
-            y < bird.getBodyY() + bird.getBodyHeight() && y + height > bird.getBodyY()) {
+        if (checkCircleRectCollision(bird.getBodyX(), bird.getBodyY(), bird.getBodyWidth(), bird.getBodyHeight())) {
             return true;
         }
+
         return false;
     }
+    private boolean checkCircleRectCollision(float x, float y, float w, float h) {
+        float tempX = hitboxCenterX - Math.max(x, Math.min(hitboxCenterX, x + w));
+        float tempY = hitboxCenterY - Math.max(y, Math.min(hitboxCenterY, y + h));
+        return tempX * tempX + tempY * tempY <= hitboxRadius * hitboxRadius;
+    }
+
+
     public float getX() { return x; }
     public float getY() { return y; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
     public int getFireIndex() {return fireIndex; }
-
+    public float getHitboxCenterX() { return hitboxCenterX; }
+    public float getHitboxCenterY() { return hitboxCenterY; }
+    public float getHitboxRadius() { return hitboxRadius; }
     public void dispose() {
         for (Texture texture : framesArray) {
             texture.dispose();

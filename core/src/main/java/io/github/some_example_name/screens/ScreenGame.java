@@ -353,6 +353,7 @@ public class ScreenGame implements Screen {
                     System.out.println("Подготовка к боссфайту завершена!");
                 }
             }
+
         }
         ScreenUtils.clear(1, 0, 0, 1);
         myGdxGame.camera.update();
