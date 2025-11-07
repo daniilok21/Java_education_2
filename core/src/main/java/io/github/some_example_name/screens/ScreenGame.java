@@ -202,15 +202,22 @@ public class ScreenGame implements Screen {
                 bird.onClick();
             }
         }
-        while (timeTime >= frameTime) {
+        while (timeTime >= frameTime ) {
             timeTime -= frameTime;
             if (isGameOver && !godMode) {
                 deathSound.play();
                 backgroundMusic.stop();
                 bossFightMusic.stop();
                 stopTimer();
-                myGdxGame.screenRestart.isWin = false;
-                myGdxGame.screenRestart.gamePoints = gamePoints;
+                if (bossFight) {
+                    myGdxGame.screenRestart.gameText = "YOU LOSE!";
+                    myGdxGame.screenRestart.isWin = true;
+                    // так получилось что isWin служит не обозначение победы, а обозначение боссфайта :D
+                }
+                else {
+                    myGdxGame.screenRestart.gamePoints = gamePoints;
+                    myGdxGame.screenRestart.isWin = false;
+                }
                 myGdxGame.setScreen(myGdxGame.screenRestart);
             }
             else if (isWin) {
