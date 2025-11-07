@@ -44,10 +44,15 @@ public class Boss {
         FlipGravitation flipGravitation = new FlipGravitation(x, speed);
         flipGravitationArray.add(flipGravitation);
     }
-    public void renderFlipGravitation(Batch batch, Bird bird) {
+    public void moveFlipGravitation() {
         for (int i = flipGravitationArray.size - 1; i >= 0; i--) {
             FlipGravitation flipGravitation = flipGravitationArray.get(i);
             flipGravitation.move();
+        }
+    }
+    public void renderFlipGravitation(Batch batch, Bird bird) {
+        for (int i = flipGravitationArray.size - 1; i >= 0; i--) {
+            FlipGravitation flipGravitation = flipGravitationArray.get(i);
             if (flipGravitation.getX() + flipGravitation.getWidth() < 0) {
                 flipGravitation.dispose();
                 flipGravitationArray.removeIndex(i);
@@ -74,16 +79,27 @@ public class Boss {
     public void backGoLava(int speed) {
         lava.setGoBack(speed);
     }
-    public void renderLava(Batch batch, Bird bird) {
+
+    public void moveLava(Bird bird) {
         if (lava != null) {
             lava.move(bird);
+        }
+    }
+    public void renderLava(Batch batch) {
+        if (lava != null) {
             lava.draw(batch);
         }
     }
-    public void renderFireball(Batch batch) {
+    public void moveFireball() {
         for (int i = fireballArray.size - 1; i >= 0; i--) {
             Fireball fireball = fireballArray.get(i);
             fireball.move();
+        }
+    }
+
+    public void renderFireball(Batch batch) {
+        for (int i = fireballArray.size - 1; i >= 0; i--) {
+            Fireball fireball = fireballArray.get(i);
             if (fireball.getX() + fireball.getWidth() < 0) {
                 fireball.dispose();
                 fireballArray.removeIndex(i);

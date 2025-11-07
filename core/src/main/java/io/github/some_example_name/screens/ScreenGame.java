@@ -172,6 +172,7 @@ public class ScreenGame implements Screen {
         fpsTimer += delta;
         if (fpsTimer >= fpsLogInterval) {
             currentFPS = Gdx.graphics.getFramesPerSecond();
+            System.out.println("FPS = " + currentFPS);
             fpsTimer = 0f;
         }
         if (Gdx.input.justTouched()) {
@@ -202,7 +203,7 @@ public class ScreenGame implements Screen {
                 bird.onClick();
             }
         }
-        while (timeTime >= frameTime ) {
+        while (timeTime >= frameTime) {
             timeTime -= frameTime;
             if (isGameOver && !godMode) {
                 deathSound.play();
@@ -271,6 +272,9 @@ public class ScreenGame implements Screen {
                 }
             }
             if (bossFight) {
+                boss.moveFireball();
+                boss.moveLava(bird);
+                boss.moveFlipGravitation();
                 if (boss.getLasersCollisionActive()) {
                     boss.updateLasers(frameTime);
                 }
@@ -376,7 +380,7 @@ public class ScreenGame implements Screen {
         if (bossFight) {
             boss.draw(myGdxGame.batch);
             boss.renderFireball(myGdxGame.batch);
-            boss.renderLava(myGdxGame.batch, bird);
+            boss.renderLava(myGdxGame.batch);
             boss.renderFlipGravitation(myGdxGame.batch, bird);
         }
         if (!bossTransition ) {
@@ -435,6 +439,7 @@ public class ScreenGame implements Screen {
 
     @Override
     public void hide() {
+        isGameOver = true;
         stopTimer();
     }
 
