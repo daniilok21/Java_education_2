@@ -34,6 +34,7 @@ public class Bird {
             new Texture("birdTiles/bird2.png"),
             new Texture("birdTiles/bird1.png"),
         };
+
         this.headOffsetXRel = 0.55f;
         this.headOffsetYRel = 0.4f;
         this.bodyOffsetXRel = 0.2f;
