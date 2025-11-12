@@ -203,7 +203,7 @@ public class ScreenGame implements Screen {
                 bird.onClick();
             }
         }
-        while (timeTime >= frameTime) {
+        if (timeTime >= frameTime) {
             timeTime -= frameTime;
             if (isGameOver && !godMode) {
                 deathSound.play();
@@ -409,7 +409,7 @@ public class ScreenGame implements Screen {
 
             shapeRenderer.end();
         }
-        // showHitboxes();
+        showHitboxes();
         // godModeChange(true);
     }
 

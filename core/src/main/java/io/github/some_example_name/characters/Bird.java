@@ -36,11 +36,11 @@ public class Bird {
         };
         this.headOffsetXRel = 0.55f;
         this.headOffsetYRel = 0.4f;
-        this.bodyOffsetXRel = 0.0f;
+        this.bodyOffsetXRel = 0.2f;
         this.bodyOffsetYRel = 0.0f;
         this.headWidth = 0.375f * width;
         this.headHeight = 0.5f * height;
-        this.bodyWidth = 0.75f * width;
+        this.bodyWidth = 0.55f * width;
         this.bodyHeight = 0.9f * height;
         this.headX = this.x + this.headOffsetXRel * this.width;
         this.headY = this.y + this.headOffsetYRel * this.height;
