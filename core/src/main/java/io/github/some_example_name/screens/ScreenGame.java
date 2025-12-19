@@ -409,7 +409,7 @@ public class ScreenGame implements Screen {
 
             shapeRenderer.end();
         }
-        showHitboxes();
+        // showHitboxes();
         // godModeChange(true);
     }
 
